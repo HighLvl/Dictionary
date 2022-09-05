@@ -1,19 +1,19 @@
 package ru.cherepanov.apps.dictionary.domain.model
 
 data class WordDef(
-    val id: DefId = DefId(),
-    val syllables: String = "tit-le",
-    val pos: String = "noun",
-    val gloss: String = "some gloss",
-    val examples: List<String> = listOf("Add a title to your slides"),
-    val synonyms: String = "header",
-    val antonyms: String = "-",
-    val hyponyms: String? = "-",
-    val hypernyms: String? = "-",
-    val etymology: String? = "",
-    val phras: List<String>? = listOf("ffdff", "ffdgg"),
-    val ipa: String? = "",
+    val id: DefId,
+    val syllables: String = "",
+    val pos: String = "",
+    val gloss: String = "",
+    val examples: List<String> = emptyList(),
+    val synonyms: String = "",
+    val antonyms: String = "",
+    val hyponyms: String? = null,
+    val hypernyms: String? = null,
+    val etymology: String? = null,
+    val phras: List<String>? = null,
+    val ipa: String? = null,
     val isFavorite: Boolean = false,
-    val lang: String = "English",
-    val isFull: Boolean = true
+    val lang: String = "",
+    val isFull: Boolean = false
 )

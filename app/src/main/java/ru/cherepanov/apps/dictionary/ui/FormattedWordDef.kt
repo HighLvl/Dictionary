@@ -17,33 +17,23 @@ data class FormattedWordDef(
     val isFull: Boolean,
     val isFavorite: Boolean,
     val num: String?,
-    val numVisibility: Boolean,
-    val pos: String,
-    val posVisibility: Boolean,
+    val pos: AnnotatedString?,
     val gloss: AnnotatedString,
     val syllables: String,
     val lang: String,
-    val examplesText: AnnotatedString,
-    val examplesVisibility: Boolean,
-    val synonyms: AnnotatedString,
-    val synonymsVisibility: Boolean,
-    val antonyms: AnnotatedString,
-    val antonymsVisibility: Boolean,
+    val examplesText: AnnotatedString?,
+    val synonyms: AnnotatedString?,
+    val antonyms: AnnotatedString?,
     val hyponyms: AnnotatedString?,
-    val hyponymsVisibility: Boolean,
     val hypernyms: AnnotatedString?,
-    val hypernymsVisibility: Boolean,
     val etymology: AnnotatedString?,
-    val etymologyVisibility: Boolean,
-    val phras: String?,
-    val phrasVisibility: Boolean,
+    val phras: AnnotatedString?,
     val ipa: AnnotatedString?,
-    val ipaVisibility: Boolean
 )
 
 fun WordDef.toFormatted(
     useAbbr: Boolean = true,
-    details: Boolean = false
+    isDetails: Boolean = false
 ): FormattedWordDef {
     val senseNum = id.senseNum?.plus(1)?.let(RomanNumeral::value)?.plus(".")
     val glossNum = id.glossNum?.plus(1)?.toString()?.plus(".")
@@ -54,36 +44,29 @@ fun WordDef.toFormatted(
         title = id.title,
         isFull = isFull,
         isFavorite = isFavorite,
-        num = num,
-        numVisibility = isVisible(num),
-        pos = pos,
-        posVisibility = isVisible(pos),
-        gloss = formatValue(gloss, useAbbr),
+        num = num.takeIfVisible(),
+        pos = pos.takeIfVisible()?.let { AnnotatedString(it) },
+        gloss = formatValue(gloss, useAbbr) ?: AnnotatedString(""),
         syllables = syllables,
         lang = lang,
-        examplesText = if (details) formatFullDefExamples(examples, useAbbr)
-        else formatShortDefExamples(examples),
-        examplesVisibility = isVisible(examples),
+        examplesText = examples.takeIfVisible()?.let {
+            if (isDetails) formatFullDefExamples(examples, useAbbr)
+            else formatShortDefExamples(examples)
+        },
         synonyms = formatValue(synonyms, useAbbr),
-        synonymsVisibility = isVisible(synonyms),
         antonyms = formatValue(antonyms, useAbbr),
-        antonymsVisibility = isVisible(antonyms),
-        hyponyms = hyponyms?.let { formatValue(it, useAbbr) },
-        hyponymsVisibility = isVisible(hyponyms),
-        hypernyms = hypernyms?.let { formatValue(it, useAbbr) },
-        hypernymsVisibility = isVisible(hypernyms),
-        etymology = etymology?.let { formatValue(it, useAbbr) },
-        etymologyVisibility = isVisible(etymology),
+        hyponyms = formatValue(hyponyms, useAbbr),
+        hypernyms = formatValue(hypernyms, useAbbr),
+        etymology = formatValue(etymology, useAbbr),
         phras = phras?.filter { it.isNotBlank() }
-            ?.joinToString("\n") { "\"${it}\"" },
-        phrasVisibility = isVisible(phras),
-        ipa = ipa?.let { formatValue(it, useAbbr) },
-        ipaVisibility = isVisible(ipa)
+            ?.joinToString("\n") { "\"${it}\"" }
+            .takeIfVisible()?.let { AnnotatedString(it) },
+        ipa = formatValue(ipa, useAbbr),
     )
 }
 
-private fun formatValue(value: String, useAbbr: Boolean) =
-    value.replaceTagWithStyle(
+private fun formatValue(value: String?, useAbbr: Boolean) =
+    value.takeIfVisible()?.replaceTagWithStyle(
         "\\{a full_text=[^\\}]+\\}",
         "\\{/a\\}",
         SpanStyle(fontStyle = FontStyle.Italic)
@@ -154,6 +137,6 @@ private fun String.replaceTagWithStyle(
     }
 }
 
-private fun isVisible(list: List<String>?) = !(list.isNullOrEmpty() || list.all { it.isBlank() })
+private fun List<String>?.takeIfVisible() = takeUnless { isNullOrEmpty() || all { it.isBlank() } }
 
-private fun isVisible(string: String?) = !string.isNullOrBlank()
+private fun String?.takeIfVisible() = takeUnless { isNullOrBlank() }

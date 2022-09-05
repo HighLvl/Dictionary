@@ -21,69 +21,62 @@ fun FormattedWordDef.getDetailsAnnotatedString() = buildAnnotatedString {
     SyllablesToGloss(syllables, id.title, gloss)
     RelatedWords(
         synonyms,
-        synonymsVisibility,
         antonyms,
-        antonymsVisibility,
-        hyponyms!!,
-        hyponymsVisibility,
-        hypernyms!!,
-        hypernymsVisibility
+        hyponyms,
+        hypernyms,
     )
-    Examples(examplesText, examplesVisibility)
-    Etymology(etymology!!, etymologyVisibility)
-    Phraseologisms(AnnotatedString(phras!!), phrasVisibility)
-    Ipa(ipa!!, ipaVisibility)
+    Examples(examplesText)
+    Etymology(etymology)
+    Phraseologisms(phras)
+    Ipa(ipa)
 }
 
 @Composable
-private fun AnnotatedString.Builder.Ipa(ipa: AnnotatedString, isVisible: Boolean) {
+private fun AnnotatedString.Builder.Ipa(ipa: AnnotatedString?) {
     KeyValueRow(
         R.string.ipa_label, ipa,
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyMedium,
         valueStyle = MaterialTheme.typography.bodyMedium,
         valueColor = MaterialTheme.colorScheme.secondary,
-        isVisible = isVisible,
         addSpacer = true
     )
 }
 
 @Composable
-private fun AnnotatedString.Builder.Phraseologisms(phras: AnnotatedString, isVisible: Boolean) {
+private fun AnnotatedString.Builder.Phraseologisms(phras: AnnotatedString?) {
     KeyValueColumn(
         R.string.phras_label,
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyLarge,
         valueStyle = MaterialTheme.typography.bodyMedium,
         valueColor = MaterialTheme.colorScheme.secondary,
-        values = listOf(phras),
-        addSpacer = true,
-        isVisible = isVisible
+        value = phras,
+        addSpacer = true
     )
 }
 
 @Composable
 private fun AnnotatedString.Builder.Etymology(
-    etymology: AnnotatedString,
-    isVisible: Boolean
+    etymology: AnnotatedString?
 ) {
+    etymology ?: return
     KeyValueColumn(
         R.string.etimology_label,
         keyStyle = MaterialTheme.typography.bodyLarge,
         keyColor = MaterialTheme.colorScheme.tertiary,
-        values = listOf(etymology),
+        value = etymology,
         addSpacer = true,
         valueStyle = MaterialTheme.typography.bodyMedium,
-        capitalize = true,
-        isVisible = isVisible
+        capitalize = true
     )
 }
 
 @Composable
-private fun AnnotatedString.Builder.PartOfSpeech(pos: String) {
+private fun AnnotatedString.Builder.PartOfSpeech(pos: AnnotatedString?) {
     KeyValueRow(
         R.string.pos_label,
-        AnnotatedString(pos),
+        pos,
         keyStyle = MaterialTheme.typography.bodyMedium,
         addSpacer = false,
         keyColor = MaterialTheme.colorScheme.tertiary
@@ -102,16 +95,12 @@ private fun AnnotatedString.Builder.Language(lang: String) {
 
 @Composable
 private fun AnnotatedString.Builder.RelatedWords(
-    synonyms: AnnotatedString,
-    isSynonymsVisible: Boolean,
-    antonyms: AnnotatedString,
-    isAntonymsVisible: Boolean,
-    hyponyms: AnnotatedString,
-    isHyponymsVisible: Boolean,
-    hypernyms: AnnotatedString,
-    isHypernymsVisible: Boolean
+    synonyms: AnnotatedString?,
+    antonyms: AnnotatedString?,
+    hyponyms: AnnotatedString?,
+    hypernyms: AnnotatedString?,
 ) {
-    if (isAntonymsVisible || isHyponymsVisible || isSynonymsVisible || isAntonymsVisible) {
+    if (synonyms != null || hyponyms != null || hypernyms != null || antonyms != null) {
         TextBlockSpacer()
     }
 
@@ -121,8 +110,7 @@ private fun AnnotatedString.Builder.RelatedWords(
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyMedium,
         valueStyle = MaterialTheme.typography.bodyMedium,
-        valueColor = MaterialTheme.colorScheme.secondary,
-        isVisible = isSynonymsVisible
+        valueColor = MaterialTheme.colorScheme.secondary
     )
     KeyValueRow(
         R.string.full_ant_label,
@@ -130,8 +118,7 @@ private fun AnnotatedString.Builder.RelatedWords(
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyMedium,
         valueStyle = MaterialTheme.typography.bodyMedium,
-        valueColor = MaterialTheme.colorScheme.secondary,
-        isVisible = isAntonymsVisible
+        valueColor = MaterialTheme.colorScheme.secondary
     )
     KeyValueRow(
         R.string.full_hypo_label,
@@ -139,8 +126,7 @@ private fun AnnotatedString.Builder.RelatedWords(
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyMedium,
         valueStyle = MaterialTheme.typography.bodyMedium,
-        valueColor = MaterialTheme.colorScheme.secondary,
-        isVisible = isHyponymsVisible
+        valueColor = MaterialTheme.colorScheme.secondary
     )
     KeyValueRow(
         R.string.full_hyper_label,
@@ -148,8 +134,7 @@ private fun AnnotatedString.Builder.RelatedWords(
         keyColor = MaterialTheme.colorScheme.tertiary,
         keyStyle = MaterialTheme.typography.bodyMedium,
         valueStyle = MaterialTheme.typography.bodyMedium,
-        valueColor = MaterialTheme.colorScheme.secondary,
-        isVisible = isHypernymsVisible
+        valueColor = MaterialTheme.colorScheme.secondary
     )
 }
 
@@ -175,16 +160,15 @@ private fun AnnotatedString.Builder.SyllablesToGloss(
 @Composable
 private fun AnnotatedString.Builder.KeyValueRow(
     @StringRes keyResId: Int = R.string.full_ant_label,
-    value: AnnotatedString,
+    value: AnnotatedString?,
     keyStyle: TextStyle = LocalTextStyle.current,
     keyColor: Color = Color.Unspecified,
     valueStyle: TextStyle = LocalTextStyle.current,
     valueColor: Color = Color.Unspecified,
     addSpacer: Boolean = false,
-    capitalize: Boolean = true,
-    isVisible: Boolean = true
+    capitalize: Boolean = true
 ) {
-    if (!isVisible) return
+    value ?: return
     if (addSpacer) TextBlockSpacer()
     withStyle(keyStyle.copy(color = keyColor).toSpanStyle()) {
         append(stringResource(id = keyResId).let {
@@ -199,8 +183,8 @@ private fun AnnotatedString.Builder.KeyValueRow(
 }
 
 @Composable
-private fun AnnotatedString.Builder.Examples(examples: AnnotatedString, isVisible: Boolean) {
-    if (!isVisible) return
+private fun AnnotatedString.Builder.Examples(examples: AnnotatedString?) {
+    examples ?: return
     TextBlockSpacer()
     withStyle(
         MaterialTheme.typography.bodyLarge
@@ -231,13 +215,12 @@ private fun AnnotatedString.Builder.KeyValueColumn(
     keyColor: Color = Color.Unspecified,
     valueStyle: TextStyle = LocalTextStyle.current,
     valueColor: Color = Color.Unspecified,
-    values: List<AnnotatedString>,
+    value: AnnotatedString?,
     addSpacer: Boolean = false,
     keySpaceHeight: TextUnit = 8.sp,
-    capitalize: Boolean = true,
-    isVisible: Boolean
+    capitalize: Boolean = true
 ) {
-    if (!isVisible) return
+    value ?: return
     if (addSpacer) TextBlockSpacer()
     withStyle(keyStyle.copy(color = keyColor).toSpanStyle()) {
         append(stringResource(id = keyResId).let {
@@ -248,10 +231,8 @@ private fun AnnotatedString.Builder.KeyValueColumn(
     }
     spacing(keySpaceHeight)
     withStyle(valueStyle.toSpanStyle().copy(color = valueColor)) {
-        for (value in values) {
-            append(value)
-            append('\n')
-        }
+        append(value)
+        append('\n')
     }
 }
 

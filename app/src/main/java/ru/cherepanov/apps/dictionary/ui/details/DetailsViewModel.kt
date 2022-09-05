@@ -20,7 +20,7 @@ class DetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: DictRepository
 ) : BaseViewModel(savedStateHandle) {
-    private val _uiState = MutableLiveData(Resource.loading(WordDef().toFormattedFullDef()))
+    private val _uiState = MutableLiveData<Resource<FormattedWordDef>>()
     val uiState: LiveData<Resource<FormattedWordDef>> = _uiState
 
     private val defId = getArgs<DetailsArgs>().defId
@@ -45,7 +45,7 @@ class DetailsViewModel @Inject constructor(
     }
 
     private fun WordDef.toFormattedFullDef(): FormattedWordDef {
-        return toFormatted(details = true)
+        return toFormatted(isDetails = true)
     }
 
     fun onAddToFavorites() {

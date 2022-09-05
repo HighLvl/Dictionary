@@ -1,8 +1,6 @@
 package ru.cherepanov.apps.dictionary.ui.details
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -15,10 +13,9 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
-import ru.cherepanov.apps.dictionary.ui.toFormatted
+import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDefStub
 
 
 @Composable
@@ -40,7 +37,7 @@ private fun DefDetailsScreen(
     onBackPressed: () -> Unit
 ) {
     val fullDefResourceNullable by viewModel.uiState.observeAsState()
-    val resource = fullDefResourceNullable!!
+    val resource = fullDefResourceNullable ?: return
 
     ResourceScaffold(
         modifier = modifier,
@@ -69,12 +66,19 @@ private fun DefDetailsScreen(
             }
         },
         onSuccess = { contentPadding, fullDef ->
-            DefDetailsMainContent(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-                fullDef = derivedStateOf { fullDef }.value
-            )
+            Column(modifier = Modifier.padding(contentPadding)) {
+                DefDetailsMainContent(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    fullDef = derivedStateOf { fullDef }.value
+                )
+                if (!fullDef.isFull) {
+                    LoadingError(
+                        modifier = Modifier.fillMaxWidth(),
+                        retry = viewModel::retry
+                    )
+                }
+            }
         },
         onLoading = { contentPadding, _ ->
             ProgressBar(modifier = Modifier.padding(contentPadding))
@@ -122,7 +126,7 @@ private fun DetailsTopAppBar(
 @Preview
 private fun DefDetailsPanel(
     modifier: Modifier = Modifier,
-    fullDef: FormattedWordDef = WordDef().toFormatted()
+    fullDef: FormattedWordDef = formattedWordDefStub()
 ) {
     val text = fullDef.getDetailsAnnotatedString()
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }

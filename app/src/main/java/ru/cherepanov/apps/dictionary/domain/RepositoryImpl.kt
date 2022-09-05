@@ -71,7 +71,7 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
                     .map { fullDef ->
                         localSource.cache(fullDef)
                         fullDef
-                    }.toMaybe()
+                    }.onErrorReturn { WordDef(id = id, isFull = false) }
             )
             .toFlowable()
             .switchMap {

@@ -23,13 +23,12 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.DefList
 import ru.cherepanov.apps.dictionary.ui.base.composable.DefTitle
 import ru.cherepanov.apps.dictionary.ui.base.composable.FavoriteIcon
 import ru.cherepanov.apps.dictionary.ui.base.composable.Language
-import ru.cherepanov.apps.dictionary.ui.toFormatted
+import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDefStub
 
 @Composable
 fun ShortDefContent(
@@ -84,7 +83,7 @@ fun ShortDefContent(
 @Preview
 private fun ShortDefItem(
     modifier: Modifier = Modifier,
-    wordDef: FormattedWordDef = WordDef(syllables = "refgrsdfgddsssgfgfgfgfggfffgffgfgggfgfg").toFormatted(),
+    wordDef: FormattedWordDef = formattedWordDefStub(),
     isFavoriteDef: (Boolean) -> Unit = {},
     onClick: () -> Unit = {}
 ) = with(wordDef) {
@@ -102,7 +101,7 @@ private fun ShortDefItem(
                 bottom = 8.dp
             )
         ) {
-            if (numVisibility || posVisibility) {
+            if (num != null || pos != null) {
                 Row {
                     DefTitle(
                         modifier = Modifier.weight(0.6f),
@@ -111,25 +110,23 @@ private fun ShortDefItem(
                     )
                     Pos(
                         modifier = Modifier.weight(0.4f),
-                        pos = pos
+                        pos = pos ?: AnnotatedString("")
                     )
                 }
                 TextBlockSpacer()
             }
             Text(text = gloss)
-            Examples(examples = examplesText, isVisible = examplesVisibility)
-            if (synonymsVisibility || antonymsVisibility) {
+            Examples(examples = examplesText)
+            if (synonyms != null || antonyms != null) {
                 TextBlockSpacer(height = 4.dp)
             }
             RelatedWords(
                 labelRes = R.string.short_syn_label,
-                relatedWords = synonyms,
-                isVisible = synonymsVisibility
+                relatedWords = synonyms
             )
             RelatedWords(
                 labelRes = R.string.short_ant_label,
-                relatedWords = antonyms,
-                isVisible = antonymsVisibility
+                relatedWords = antonyms
             )
             Row {
                 Language(
@@ -155,7 +152,7 @@ private fun FavoriteButton(isFavorite: Boolean, onCheckedChange: (Boolean) -> Un
 
 
 @Composable
-private fun Pos(modifier: Modifier, pos: String) {
+private fun Pos(modifier: Modifier, pos: AnnotatedString) {
     Text(
         modifier = modifier,
         text = pos,
@@ -167,10 +164,9 @@ private fun Pos(modifier: Modifier, pos: String) {
 
 @Composable
 private fun Examples(
-    examples: AnnotatedString,
-    isVisible: Boolean
+    examples: AnnotatedString?
 ) {
-    if (!isVisible) return
+    examples ?: return
     TextBlockSpacer()
     Text(
         text = examples,
@@ -186,10 +182,9 @@ private fun Examples(
 private fun RelatedWords(
     modifier: Modifier = Modifier,
     @StringRes labelRes: Int,
-    relatedWords: AnnotatedString,
-    isVisible: Boolean
+    relatedWords: AnnotatedString?
 ) {
-    if (!isVisible) return
+    relatedWords ?: return
     Row(modifier = modifier, verticalAlignment = Alignment.Top) {
         Text(
             text = stringResource(id = labelRes),
