@@ -189,11 +189,15 @@ private fun RelatedWords(
         Text(
             text = stringResource(id = labelRes),
             color = MaterialTheme.colorScheme.tertiary,
-            style = MaterialTheme.typography.labelMedium,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
+            style = MaterialTheme.typography.labelMedium
         )
-        Text(text = relatedWords)
+        Text(
+            text = relatedWords,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
     }
 }
 

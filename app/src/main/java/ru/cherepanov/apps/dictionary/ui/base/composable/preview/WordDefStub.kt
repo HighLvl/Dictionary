@@ -10,7 +10,7 @@ fun wordDefStub(): WordDef {
         id = DefId(title = "title", langNum = 0, senseNum = 0, glossNum = 0),
         syllables = "syl-lab-les",
         antonyms = "antonyms",
-        synonyms = "synonyms",
+        synonyms = (1..50).fold("") {prev, _ -> prev + "synonyms"},
         examples = listOf("examples"),
         gloss = "gloss",
         isFavorite = false,
