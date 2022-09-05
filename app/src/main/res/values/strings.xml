@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Dictionary</string>
+    <string name="num_title">%1$s %2$s</string>
+    <string name="short_syn_label">син.:\u0020</string>
+    <string name="short_ant_label">ант.:\u0020</string>
+    <string name="search_hint">Поиск</string>
+    <string name="language_label">язык:\u0020</string>
+    <string name="pos_label">часть речи:\u0020</string>
+    <string name="examples_label">примеры:\u0020</string>
+    <string name="etimology_label">этимология:\u0020</string>
+    <string name="full_syn_label">синонимы:\u0020</string>
+    <string name="full_ant_label">антонимы:\u0020</string>
+    <string name="full_hypo_label">гипонимы:\u0020</string>
+    <string name="full_hyper_label">гиперонимы:\u0020</string>
+    <string name="phras_label">фразеологизмы и устойчивые сочетания:\u0020</string>
+    <string name="ipa_label">МФА:\u0020</string>
+    <string name="phras_item">\'%1$s\'</string>
+    <string name="search_label">Поиск</string>
+    <string name="favorites_label">Избранное</string>
+    <string name="dash_gloss">\u0020\u2014\u0020</string>
+    <string name="context_menu_search">Поиск</string>
+</resources>
