@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
@@ -12,8 +13,8 @@ abstract class DictRepository(
 ) {
     abstract fun getRandomWordShortDefs(): Flowable<List<WordDef>>
     abstract fun getShortDefsByTitle(title: String): Flowable<List<WordDef>>
-    abstract fun addToFavorites(id: DefId): Single<Unit>
-    abstract fun removeFromFavorites(id: DefId): Single<Unit>
+    abstract fun addToFavorites(id: DefId): Completable
+    abstract fun removeFromFavorites(id: DefId): Completable
     abstract fun findWordTitles(searchTerm: String, filter: Filter): Single<List<String>>
     abstract fun getFullDefById(id: DefId): Flowable<WordDef>
     abstract fun getFavorites(): Flowable<List<WordDef>>

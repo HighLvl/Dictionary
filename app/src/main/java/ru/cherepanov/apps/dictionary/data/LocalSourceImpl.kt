@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.data
 
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -31,7 +32,7 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
         }.map(WordDefEntity::mapToWordDef)
     }
 
-    override fun setFavorite(id: DefId, value: Boolean): Single<Unit> {
+    override fun setFavorite(id: DefId, value: Boolean): Completable {
         return with(id.mapToEntityId()) {
             dao.setFavorite(
                 title,

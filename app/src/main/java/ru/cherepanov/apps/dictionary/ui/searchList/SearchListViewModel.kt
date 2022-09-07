@@ -3,9 +3,8 @@ package ru.cherepanov.apps.dictionary.ui.searchList
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
-import ru.cherepanov.apps.dictionary.domain.interactors.GetShortDefs
-import ru.cherepanov.apps.dictionary.domain.interactors.UpdateFavorites
-import ru.cherepanov.apps.dictionary.domain.interactors.ValueInteractor
+import ru.cherepanov.apps.dictionary.domain.interactors.*
+import ru.cherepanov.apps.dictionary.domain.interactors.base.ValueInteractor
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Resource
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef

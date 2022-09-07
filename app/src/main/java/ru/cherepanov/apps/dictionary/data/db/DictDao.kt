@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -75,7 +76,7 @@ interface DictDao {
         senseNum: Int,
         glossNum: Int,
         value: Boolean
-    ): Single<Unit>
+    ): Completable
 
     @Query("SELECT * FROM definitions WHERE isFavorite = 1 ORDER BY updatedAt DESC")
     fun getFavorites(): Flowable<List<WordDefEntity>>

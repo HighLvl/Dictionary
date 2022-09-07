@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -43,17 +44,15 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
                 localSource.getAllByTitle(title)
             }
 
-    override fun addToFavorites(id: DefId): Single<Unit> =
+    override fun addToFavorites(id: DefId): Completable =
         localSource.isFullDefCached(id)
             .switchIfEmpty(
                 remoteSource.getFullGloss(id).map { fullDef ->
                     localSource.cache(fullDef)
                     true
                 }.toMaybe()
-            ).toSingle()
-            .flatMap {
-                localSource.setFavorite(id, true)
-            }
+            ).ignoreElement()
+            .andThen(localSource.setFavorite(id, true))
 
     override fun removeFromFavorites(id: DefId) =
         localSource.setFavorite(id, false)

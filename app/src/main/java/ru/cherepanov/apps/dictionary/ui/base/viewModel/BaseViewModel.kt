@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import io.reactivex.Flowable
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import ru.cherepanov.apps.dictionary.domain.model.Resource
@@ -62,9 +61,8 @@ abstract class BaseViewModel<T : Any>(
         }
     }
 
-    fun <T> Single<T>.subscribe(compositeDisposable: CompositeDisposable) {
-        subscribe().also {
-            compositeDisposable.add(it)
-        }
+
+    fun Completable.subscribe(compositeDisposable: CompositeDisposable) {
+        subscribe().also { compositeDisposable.add(it) }
     }
 }

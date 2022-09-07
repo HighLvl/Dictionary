@@ -2,6 +2,7 @@ package ru.cherepanov.apps.dictionary.domain.interactors
 
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import ru.cherepanov.apps.dictionary.domain.interactors.base.ResourceSubjectInteractor
 import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.domain.repository.DictRepository
 import javax.inject.Inject

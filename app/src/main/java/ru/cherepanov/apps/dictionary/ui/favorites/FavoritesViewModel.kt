@@ -24,7 +24,6 @@ class FavoritesViewModel @Inject constructor(
 
     init {
         subscribeUiState()
-        onGetFavorites()
     }
 
     private fun subscribeUiState(
@@ -40,10 +39,6 @@ class FavoritesViewModel @Inject constructor(
                     status = favoritesResource.mapToStatus()
                 )
             }
-    }
-
-    private fun onGetFavorites() {
-        getFavorites(Unit)
     }
 
     fun onRemoveFromFavorites(id: DefId) {
