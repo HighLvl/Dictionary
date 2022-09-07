@@ -45,14 +45,15 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
             }
 
     override fun addToFavorites(id: DefId): Completable =
-        localSource.isFullDefCached(id)
-            .switchIfEmpty(
-                remoteSource.getFullGloss(id).map { fullDef ->
-                    localSource.cache(fullDef)
-                    true
-                }.toMaybe()
-            ).ignoreElement()
-            .andThen(localSource.setFavorite(id, true))
+        localSource.setFavorite(id, true).andThen(
+            localSource.isFullDefCached(id)
+                .switchIfEmpty(
+                    remoteSource.getFullGloss(id).map { fullDef ->
+                        localSource.cache(fullDef)
+                        true
+                    }.onErrorReturnItem(false).toMaybe()
+                ).ignoreElement()
+        )
 
     override fun removeFromFavorites(id: DefId) =
         localSource.setFavorite(id, false)
