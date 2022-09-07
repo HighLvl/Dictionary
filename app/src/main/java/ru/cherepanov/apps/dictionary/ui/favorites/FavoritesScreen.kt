@@ -22,12 +22,14 @@ import ru.cherepanov.apps.dictionary.ui.base.observeUiState
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    onItemSelected: (DefId) -> Unit = {}
+    onItemSelected: (DefId) -> Unit = {},
+    onBackPressed: (() -> Unit)
 ) {
     FavoritesScreen(
         modifier = modifier,
         viewModel = hiltViewModel(),
-        onItemSelected = onItemSelected
+        onItemSelected = onItemSelected,
+        onBackPressed = onBackPressed
     )
 }
 
@@ -35,7 +37,8 @@ fun FavoritesScreen(
 private fun FavoritesScreen(
     modifier: Modifier,
     viewModel: FavoritesViewModel,
-    onItemSelected: (DefId) -> Unit
+    onItemSelected: (DefId) -> Unit,
+    onBackPressed: (() -> Unit)
 ) {
     val uiState by viewModel.uiState.observeUiState()
 
@@ -43,7 +46,12 @@ private fun FavoritesScreen(
         status = uiState.status,
         modifier = modifier,
         topBar = {
-            TitleTopBar(titleResId = R.string.favorites_label)
+            TitleTopBar(
+                titleResId = R.string.favorites_label,
+                navigationIcon = {
+                    BackButton(onBackPressed = onBackPressed)
+                }
+            )
         },
         onSuccess = {
             FavoritesContent(

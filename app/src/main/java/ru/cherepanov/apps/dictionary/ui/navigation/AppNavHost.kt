@@ -53,11 +53,12 @@ fun AppNavHost(
                 searchTerm = args?.takeIf { it.isActivityArg }?.searchTerm,
                 onSelectWordSuggestion = { appState.navigateToSearchList(it) },
                 onShowSearch = appState::navigateToSearch,
-                isOnlyEntryInBackStack = appState::isOnlyEntryInBackStack
+                isBackButtonGone = appState::isOnlyEntryInBackStack
             )
             favoritesGraph(
                 contentPadding = it,
-                onItemSelected = { appState.navigateToSearchList(defId = it) }
+                onItemSelected = { appState.navigateToSearchList(defId = it) },
+                onBackPressed = appState::navigateUp
             )
         }
     }
@@ -73,7 +74,7 @@ private fun NavGraphBuilder.mainGraph(
     searchTerm: String?,
     onSelectWordSuggestion: (String) -> Unit,
     onShowSearch: (String) -> Unit,
-    isOnlyEntryInBackStack: (NavBackStackEntry) -> Boolean
+    isBackButtonGone: (NavBackStackEntry) -> Boolean
 ) {
     navigation(startDestination = "home", Sections.Main.route) {
         addHomeDestination(navigateToSearch, searchTerm)
@@ -82,7 +83,7 @@ private fun NavGraphBuilder.mainGraph(
             onSelectShortDef,
             onBackPressed,
             onShowSearch,
-            isOnlyEntryInBackStack
+            isBackButtonGone
         )
         addDetailsDestination(contentPadding, onBackPressed)
         addSearchDestination(
@@ -121,13 +122,13 @@ private fun NavGraphBuilder.addSearchListDestination(
     onSelectShortDef: (DefId) -> Unit,
     onBackPressed: () -> Unit,
     onShowSearch: (String) -> Unit,
-    isOnlyEntryInBackStack: (NavBackStackEntry) -> Boolean
+    isBackButtonGone: (NavBackStackEntry) -> Boolean
 ) {
     composable(Destinations.SearchList.route) {
         SearchListScreen(
             modifier = Modifier.padding(contentPadding),
             onSelectShortDef = onSelectShortDef,
-            onBackPressed = onBackPressed.takeUnless { _ -> isOnlyEntryInBackStack(it) },
+            onBackPressed = onBackPressed.takeUnless { _ -> isBackButtonGone(it) },
             onShowSearch = onShowSearch
         )
     }
@@ -149,13 +150,15 @@ private fun NavGraphBuilder.addSearchDestination(
 
 private fun NavGraphBuilder.favoritesGraph(
     contentPadding: PaddingValues,
-    onItemSelected: (DefId) -> Unit
+    onItemSelected: (DefId) -> Unit,
+    onBackPressed: () -> Unit
 ) {
     navigation(Destinations.Favorites.route, Sections.Favorites.route) {
         composable(Destinations.Favorites.route) {
             FavoritesScreen(
                 modifier = Modifier.padding(contentPadding),
-                onItemSelected = onItemSelected
+                onItemSelected = onItemSelected,
+                onBackPressed = onBackPressed
             )
         }
     }
