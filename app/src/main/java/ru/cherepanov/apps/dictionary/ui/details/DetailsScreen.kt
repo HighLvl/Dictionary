@@ -3,7 +3,6 @@ package ru.cherepanov.apps.dictionary.ui.details
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalTextToolbar
@@ -16,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDefStub
+import ru.cherepanov.apps.dictionary.ui.base.observeUiState
+import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 
 
 @Composable
@@ -36,14 +37,13 @@ private fun DefDetailsScreen(
     viewModel: DetailsViewModel,
     onBackPressed: () -> Unit
 ) {
-    val fullDefResourceNullable by viewModel.uiState.observeAsState()
-    val resource = fullDefResourceNullable ?: return
+    val uiState by viewModel.uiState.observeUiState()
 
-    ResourceScaffold(
+    StatusScaffold(
         modifier = modifier,
-        resource = resource,
+        status = uiState.status,
         topBar = {
-            val fullDef = resource.data
+            val fullDef = uiState.wordDef
             DetailsTopAppBar(
                 num = fullDef.num,
                 title = fullDef.id.title,
@@ -51,10 +51,10 @@ private fun DefDetailsScreen(
             )
         },
         floatingActionButton = {
-            if (resource.isSuccess()) {
+            if (uiState.status == Status.SUCCESS) {
                 FavoriteButton(
                     modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
-                    isFavorite = resource.data.isFavorite,
+                    isFavorite = uiState.wordDef.isFavorite,
                     onCheckedChange = {
                         if (it) {
                             viewModel.onAddToFavorites()
@@ -65,14 +65,14 @@ private fun DefDetailsScreen(
                 )
             }
         },
-        onSuccess = { contentPadding, fullDef ->
+        onSuccess = { contentPadding ->
             Column(modifier = Modifier.padding(contentPadding)) {
                 DefDetailsMainContent(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    fullDef = derivedStateOf { fullDef }.value
+                    fullDef = derivedStateOf { uiState.wordDef }.value
                 )
-                if (!fullDef.isFull) {
+                if (!uiState.wordDef.isFull) {
                     LoadingError(
                         modifier = Modifier.fillMaxWidth(),
                         retry = viewModel::retry
@@ -80,7 +80,7 @@ private fun DefDetailsScreen(
                 }
             }
         },
-        onLoading = { contentPadding, _ ->
+        onLoading = { contentPadding ->
             ProgressBar(modifier = Modifier.padding(contentPadding))
         },
         onError = {

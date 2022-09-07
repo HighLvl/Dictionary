@@ -1,5 +1,9 @@
 package ru.cherepanov.apps.dictionary.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
 data class WordDef(
     val id: DefId,
     val syllables: String = "",
@@ -17,3 +21,12 @@ data class WordDef(
     val lang: String = "",
     val isFull: Boolean = false
 )
+
+@Serializable
+@Parcelize
+data class DefId(
+    val title: String = "",
+    val langNum: Int? = null,
+    val senseNum: Int? = null,
+    val glossNum: Int? = null,
+): Parcelable

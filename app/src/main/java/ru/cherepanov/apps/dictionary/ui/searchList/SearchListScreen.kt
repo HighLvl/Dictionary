@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.Resource
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
+import ru.cherepanov.apps.dictionary.ui.base.observeUiState
 
 
 @Composable
@@ -57,18 +56,16 @@ private fun SearchListScreen(
     onSelectShortDef: (DefId) -> Unit,
     onShowSearch: (String) -> Unit
 ) {
-    val nullableResource by viewModel.uiState.observeAsState()
-    val resource = nullableResource!!
+    val uiState by viewModel.uiState.observeUiState()
     SearchListScreen(
         modifier = modifier,
-        resource = resource,
+        uiState = uiState,
         onBackPressed = onBackPressed,
         onSelectShortDef = onSelectShortDef,
         onLoadRandomWord = viewModel::onLoadRandomWord,
-        onShowSearch = { onShowSearch(resource.data.title ?: "") },
+        onShowSearch = { onShowSearch(uiState.title) },
         onAddToFavorites = viewModel::onAddToFavorites,
         onRemoveFromFavorites = viewModel::onRemoveFromFavorites,
-        onIntoViewBrought = viewModel::onIntoViewBrought,
         onRetry = viewModel::retry
     )
 }
@@ -77,23 +74,22 @@ private fun SearchListScreen(
 @Composable
 private fun SearchListScreen(
     modifier: Modifier,
-    resource: Resource<SearchListUiState>,
+    uiState: SearchListState,
     onBackPressed: (() -> Unit)?,
     onSelectShortDef: (DefId) -> Unit,
     onLoadRandomWord: () -> Unit,
     onShowSearch: () -> Unit,
     onAddToFavorites: (DefId) -> Unit,
     onRemoveFromFavorites: (DefId) -> Unit,
-    onIntoViewBrought: () -> Unit,
     onRetry: () -> Unit
 ) {
     var offset by remember {
         mutableStateOf(0f)
     }
     val scrollBehaviour = rememberScrollBehaviour(onContentOffsetChange = { offset = it })
-    ResourceScaffold(
+    StatusScaffold(
         modifier = modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-        resource = resource,
+        status = uiState.status,
         topBar = {
             Column {
                 TitleTopBar(titleResId = R.string.search_label,
@@ -102,7 +98,7 @@ private fun SearchListScreen(
                     }
                 )
                 SearchBar(
-                    title = resource.data.wordTitle,
+                    title = uiState.title,
                     hintResId = R.string.search_hint,
                     onClick = onShowSearch,
                     scrollBehaviour = scrollBehaviour,
@@ -116,7 +112,7 @@ private fun SearchListScreen(
                 onClick = onLoadRandomWord
             )
         },
-        onSuccess = { contentPadding, uiState ->
+        onSuccess = { contentPadding ->
             Column(
                 modifier = Modifier
                     .padding(contentPadding)
@@ -129,13 +125,12 @@ private fun SearchListScreen(
                     addToFavorites = onAddToFavorites,
                     removeFromFavorites = onRemoveFromFavorites,
                     onClick = onSelectShortDef,
-                    bringIntoViewShortDefId = uiState.defId,
-                    onIntoViewBrought = onIntoViewBrought
+                    bringIntoViewShortDefId = uiState.defId
                 )
             }
         },
-        onLoading = { contentPAdding, _ ->
-            ProgressBar(modifier = Modifier.padding(contentPAdding))
+        onLoading = { contentPadding ->
+            ProgressBar(modifier = Modifier.padding(contentPadding))
         },
         onError = {
             LoadingError(

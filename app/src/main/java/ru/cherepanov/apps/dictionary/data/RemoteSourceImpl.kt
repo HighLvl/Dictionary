@@ -16,6 +16,10 @@ class RemoteSourceImpl @Inject constructor(private val webService: DictionaryWeb
         return webService.findTitlesHavingPrefix(prefix)
     }
 
+    override fun findSimilarWordTitles(searchTerm: String): Single<List<String>> {
+        return webService.findSimilarWordTitles(searchTerm)
+    }
+
     override fun getShortGlossList(
         title: String
     ): Single<List<WordDef>> {

@@ -1,15 +1,16 @@
 package ru.cherepanov.apps.dictionary.ui.search
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -26,9 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import ru.cherepanov.apps.dictionary.R
+import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.ui.base.composable.BackButton
 import ru.cherepanov.apps.dictionary.ui.base.composable.LoadingError
-import ru.cherepanov.apps.dictionary.ui.base.composable.ResourceScaffold
+import ru.cherepanov.apps.dictionary.ui.base.composable.StatusScaffold
+import ru.cherepanov.apps.dictionary.ui.base.observeUiState
+import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 
 @Composable
 fun SearchScreen(
@@ -44,6 +48,7 @@ fun SearchScreen(
     )
 }
 
+
 @Composable
 private fun SearchScreen(
     modifier: Modifier,
@@ -51,27 +56,28 @@ private fun SearchScreen(
     onBackPressed: () -> Unit,
     onSelectSuggestion: (String) -> Unit
 ) {
-    val resourceNullable by viewModel.uiState.observeAsState()
-    val resource = resourceNullable!!
+    val uiState by viewModel.uiState.observeUiState()
 
     BackHandler {
         onBackPressed()
     }
 
-    ResourceScaffold(
+    StatusScaffold(
         modifier = modifier,
-        resource = resource,
+        status = uiState.status,
         topBar = {
             SearchBar(
-                searchTerm = resource.data.searchTerm,
-                isLoading = resource.isLoading(),
-                onValueChange = viewModel::onFetchSuggestions,
+                searchTerm = uiState.searchTerm,
+                onValueChange = viewModel::onChangeSearchTerm,
+                isLoading = uiState.status == Status.LOADING,
+                filterState = uiState.filter.mapToFilterState(),
+                onChangeFilterState = { viewModel.onChangeFilter(it.mapToFilter()) },
                 onBackPressed = onBackPressed
             )
         },
-        onSuccess = { contentPadding, searchState ->
+        onSuccess = { contentPadding ->
             LazyColumn(modifier = Modifier.padding(contentPadding)) {
-                items(searchState.suggestions) { suggestion ->
+                items(uiState.suggestions) { suggestion ->
                     SuggestionItem(suggestion, onClick = { onSelectSuggestion(suggestion) })
                 }
             }
@@ -84,6 +90,22 @@ private fun SearchScreen(
         }
     )
 }
+
+private fun FilterState.mapToFilter(): Filter =
+    Filter(
+        searchMode = when (searchMode) {
+            FilterState.SearchMode.FUZZY -> Filter.SearchMode.FUZZY
+            FilterState.SearchMode.PREFIX -> Filter.SearchMode.PREFIX
+        }
+    )
+
+private fun Filter.mapToFilterState(): FilterState =
+    FilterState(
+        searchMode = when (searchMode) {
+            Filter.SearchMode.FUZZY -> FilterState.SearchMode.FUZZY
+            Filter.SearchMode.PREFIX -> FilterState.SearchMode.PREFIX
+        }
+    )
 
 @Composable
 private fun SuggestionItem(suggestion: String, onClick: () -> Unit) {
@@ -105,35 +127,38 @@ private fun SuggestionItem(suggestion: String, onClick: () -> Unit) {
     }
 }
 
-@Composable
-@Preview
-private fun SearchBarPreview() {
-    SearchBar(
-        searchTerm = "",
-        isLoading = true,
-        onValueChange = {},
-        onBackPressed = {})
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchBar(
     searchTerm: String,
+    filterState: FilterState,
+    onChangeFilterState: (FilterState) -> Unit,
     isLoading: Boolean,
     onValueChange: (String) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
 ) {
     Column {
-        Row(
-            modifier = Modifier
-                .height(64.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BackButton(onBackPressed)
-            SearchTextField(searchTerm, isLoading, onValueChange)
-        }
+        SmallTopAppBar(
+            navigationIcon = {
+                BackButton(
+                    onBackPressed = onBackPressed
+                )
+            },
+            actions = {
+                SearchTextField(
+                    initialText = searchTerm,
+                    isLoading = isLoading,
+                    onValueChange = onValueChange
+                )
+                Filter(
+                    state = filterState,
+                    onChangeState = onChangeFilterState
+                )
+            },
+            title = {})
         Divider(thickness = 1.dp)
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -187,5 +212,67 @@ private fun SearchTextField(
                 color = MaterialTheme.colorScheme.outline
             )
         }
+    }
+}
+
+@Composable
+@Preview
+private fun FilterPreview() {
+    var state by remember {
+        mutableStateOf(FilterState())
+    }
+
+    Filter(
+        state = state,
+        onChangeState = { state = it }
+    )
+}
+
+@Composable
+private fun Filter(state: FilterState, onChangeState: (FilterState) -> Unit) {
+    var showFilterMenu by rememberSaveable { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { showFilterMenu = !showFilterMenu }) {
+            Icon(imageVector = Icons.Filled.FilterList, contentDescription = null)
+        }
+        FilterMenu(
+            expanded = showFilterMenu, onDismissRequest = { showFilterMenu = false },
+            state = state, onChangeState = onChangeState
+        )
+    }
+}
+
+@Composable
+private fun FilterMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    state: FilterState,
+    onChangeState: (FilterState) -> Unit
+) {
+    DropdownMenu(
+        modifier = Modifier.padding(16.dp),
+        expanded = expanded, onDismissRequest = onDismissRequest
+    ) {
+        Column {
+            Text(text = stringResource(id = R.string.search_mode_label))
+            for (searchMode in FilterState.SearchMode.values()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = state.searchMode == searchMode,
+                        onClick = { onChangeState(state.copy(searchMode = searchMode)) }
+                    )
+                    Text(text = stringResource(id = searchMode.titleResId))
+                }
+            }
+        }
+    }
+}
+
+private data class FilterState(val searchMode: SearchMode = SearchMode.PREFIX) {
+    enum class SearchMode(@StringRes val titleResId: Int) {
+        PREFIX(R.string.search_mode_prefix), FUZZY(R.string.search_mode_fuzzy)
     }
 }

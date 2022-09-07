@@ -1,13 +1,11 @@
-package ru.cherepanov.apps.dictionary.domain
+package ru.cherepanov.apps.dictionary.domain.repository
 
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
+import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
-import ru.cherepanov.apps.dictionary.domain.repository.DictRepository
-import ru.cherepanov.apps.dictionary.domain.repository.LocalSource
-import ru.cherepanov.apps.dictionary.domain.repository.RemoteSource
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource: RemoteSource) :
@@ -60,8 +58,11 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
     override fun removeFromFavorites(id: DefId) =
         localSource.setFavorite(id, false)
 
-    override fun getWordTitlesStartsWith(prefix: String): Single<List<String>> {
-        return remoteSource.findTitlesHavingPrefix(prefix)
+    override fun findWordTitles(searchTerm: String, filter: Filter): Single<List<String>> {
+        return when (filter.searchMode) {
+            Filter.SearchMode.FUZZY -> remoteSource.findSimilarWordTitles(searchTerm)
+            Filter.SearchMode.PREFIX -> remoteSource.findTitlesHavingPrefix(searchTerm)
+        }
     }
 
     override fun getFullDefById(id: DefId): Flowable<WordDef> =

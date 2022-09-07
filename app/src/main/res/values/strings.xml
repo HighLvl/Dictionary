@@ -19,4 +19,7 @@
     <string name="favorites_label">Избранное</string>
     <string name="dash_gloss">\u0020\u2014\u0020</string>
     <string name="context_menu_search">Поиск</string>
+    <string name="search_mode_label">Режим поиска:</string>
+    <string name="search_mode_fuzzy">Нечеткий</string>
+    <string name="search_mode_prefix">Префикс</string>
 </resources>

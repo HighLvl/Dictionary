@@ -1,7 +1,6 @@
 package ru.cherepanov.apps.dictionary.data.network
 
 import io.reactivex.Single
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -33,4 +32,7 @@ interface DictionaryWebService {
     @GET("/getShortGlossListByRandomTitle")
     fun getShortGlossListByRandomTitle(
     ): Single<List<WordDefDto>>
+
+    @GET("/findSimilarWordTitles/{searchTerm}")
+    fun findSimilarWordTitles(@Path("searchTerm") searchTerm: String): Single<List<String>>
 }

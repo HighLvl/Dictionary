@@ -1,75 +1,86 @@
 package ru.cherepanov.apps.dictionary.ui.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
-import ru.cherepanov.apps.dictionary.domain.repository.DictRepository
+import ru.cherepanov.apps.dictionary.domain.interactors.GetSuggestions
+import ru.cherepanov.apps.dictionary.domain.interactors.ValueInteractor
+import ru.cherepanov.apps.dictionary.domain.model.Filter
+import ru.cherepanov.apps.dictionary.domain.model.Resource
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.Resource
+import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchArgs
 import javax.inject.Inject
 
 data class SearchState(
     val searchTerm: String = "",
-    val suggestions: List<String> = emptyList()
+    val suggestions: List<String> = emptyList(),
+    val filter: Filter = Filter(Filter.SearchMode.PREFIX),
+    val status: Status = Status.LOADING
 )
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: DictRepository
-) : BaseViewModel(savedStateHandle) {
-    private val uiEvent = BehaviorSubject.create<UIEvent>()
-    private val _uiState = MutableLiveData(Resource(SearchState("", emptyList())))
-    val uiState: LiveData<Resource<SearchState>> = _uiState
+    private val getSuggestions: GetSuggestions
+) : BaseViewModel<SearchState>(savedStateHandle, SearchState()) {
+    private val changeFilter = ValueInteractor<Filter>()
+    private val changeSearchTerm = ValueInteractor<String>()
 
     init {
         subscribeUiState()
-        onFetchSuggestions(getArgs<SearchArgs>().searchTerm)
+        getSuggestionsOnFilterChange()
+        getSuggestionsOnSearchTermChange()
+        onChangeSearchTerm(getArgs<SearchArgs>().searchTerm)
     }
 
-    private fun subscribeUiState() {
-        uiEvent.switchMap { event ->
-            when (event) {
-                is UIEvent.FetchSuggestions -> fetchSuggestions(event.searchTerm)
-            }
-        }
-            .subscribeAndObserveOnMainThread(disposables) {
-                _uiState.value = it
-            }
-    }
-
-    private fun fetchSuggestions(searchTerm: String): Observable<Resource<SearchState>> {
-        return repository.getWordTitlesStartsWith(searchTerm).toObservable().map {
-            Resource.success(
-                SearchState(
-                    searchTerm = searchTerm,
-                    suggestions = it
-                )
+    private fun subscribeUiState(
+        initialSearchTerm: String = "",
+        initialSuggestionsResource: Resource<List<String>> = Resource.success(emptyList()),
+        initialFilter: Filter = Filter(searchMode = Filter.SearchMode.PREFIX)
+    ) {
+        Observable.combineLatest(
+            changeSearchTerm.observable(initialSearchTerm),
+            getSuggestions.observable(initialSuggestionsResource),
+            changeFilter.observable(initialFilter)
+        ) { searchTerm, suggestionsResource, filter ->
+            SearchState(
+                searchTerm = searchTerm,
+                suggestions = when (suggestionsResource) {
+                    is Resource.Success -> suggestionsResource.data
+                    else -> emptyList()
+                },
+                filter = filter,
+                status = suggestionsResource.mapToStatus()
             )
-        }.startWith(
-            Resource.loading(SearchState(searchTerm = searchTerm))
-        ).onErrorReturn { throwable ->
-            Resource.error(
-                SearchState(searchTerm = searchTerm),
-                error = throwable
-            )
-        }.subscribeOn(Schedulers.io())
-    }
-
-
-    fun onFetchSuggestions(searchTerm: String) {
-        runRepeatable {
-            if (searchTerm.isNotBlank())
-                uiEvent.onNext(UIEvent.FetchSuggestions(searchTerm))
+        }.subscribeAndObserveOnMainThread(disposables) {
+            state = it
         }
     }
 
-    private sealed class UIEvent {
-        data class FetchSuggestions(val searchTerm: String) : UIEvent()
+    private fun getSuggestionsOnSearchTermChange() {
+        changeSearchTerm.observable()
+            .subscribeAndObserveOnMainThread(disposables) { searchTerm ->
+                runRepeatable {
+                    getSuggestions(GetSuggestions.Args(searchTerm, state.filter))
+                }
+            }
+    }
+
+    private fun getSuggestionsOnFilterChange() {
+        changeFilter.observable()
+            .subscribeAndObserveOnMainThread(disposables) { filter ->
+                runRepeatable {
+                    getSuggestions(GetSuggestions.Args(state.searchTerm, filter))
+                }
+            }
+    }
+
+    fun onChangeFilter(filter: Filter) {
+        changeFilter(filter)
+    }
+
+    fun onChangeSearchTerm(searchTerm: String) {
+        changeSearchTerm(searchTerm)
     }
 }

@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,21 +37,23 @@ fun ShortDefContent(
     addToFavorites: (DefId) -> Unit,
     removeFromFavorites: (DefId) -> Unit,
     onClick: (DefId) -> Unit = {},
-    bringIntoViewShortDefId: DefId? = null,
-    onIntoViewBrought: () -> Unit = {}
+    bringIntoViewShortDefId: DefId? = null
 ) {
     val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    if (bringIntoViewShortDefId != null) {
+    var isBroughtIntoView by rememberSaveable(bringIntoViewShortDefId) {
+        mutableStateOf(false)
+    }
+    if (bringIntoViewShortDefId != null && !isBroughtIntoView) {
         LaunchedEffect(Unit) {
             coroutineScope.launch {
                 val shortDefIndex = shortDefs.indexOfFirst {
                     it.id == bringIntoViewShortDefId
                 }
                 scrollState.animateScrollToItem(shortDefIndex)
+                isBroughtIntoView = true
             }
         }
-        onIntoViewBrought()
     }
 
     DefList(
