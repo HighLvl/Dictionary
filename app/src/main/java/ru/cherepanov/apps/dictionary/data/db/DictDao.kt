@@ -31,7 +31,7 @@ interface DictDao {
                 "id_glossNum = :glossNum AND " +
                 "isFull = 1 LIMIT 1"
     )
-    fun getFullDefById(
+    fun getWordDefById(
         title: String,
         langNum: Int,
         senseNum: Int,

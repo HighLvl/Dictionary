@@ -12,7 +12,7 @@ import javax.inject.Inject
 class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource: RemoteSource) :
     DictRepository(localSource, remoteSource) {
     override fun getRandomWordShortDefs(): Flowable<List<WordDef>> =
-        remoteSource.getShortGlossListByRandomTitle()
+        remoteSource.getRandomWordShortDefs()
             .flatMap { shortDefs ->
                 val title = shortDefs.first().id.title
                 localSource.isShortDefsCached(title)
@@ -33,7 +33,7 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
     override fun getShortDefsByTitle(title: String): Flowable<List<WordDef>> =
         localSource.isShortDefsCached(title)
             .switchIfEmpty(
-                remoteSource.getShortGlossList(title)
+                remoteSource.getShortDefsByTitle(title)
                     .map { shortDefs ->
                         localSource.cache(shortDefs)
                         true
@@ -48,7 +48,7 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
         localSource.setFavorite(id, true).andThen(
             localSource.isFullDefCached(id)
                 .switchIfEmpty(
-                    remoteSource.getFullGloss(id).map { fullDef ->
+                    remoteSource.getFullDefById(id).map { fullDef ->
                         localSource.cache(fullDef)
                         true
                     }.onErrorReturnItem(false).toMaybe()
@@ -68,7 +68,7 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
     override fun getFullDefById(id: DefId): Flowable<WordDef> =
         localSource.getFullDefById(id)
             .switchIfEmpty(
-                remoteSource.getFullGloss(id)
+                remoteSource.getFullDefById(id)
                     .map { fullDef ->
                         localSource.cache(fullDef)
                         fullDef

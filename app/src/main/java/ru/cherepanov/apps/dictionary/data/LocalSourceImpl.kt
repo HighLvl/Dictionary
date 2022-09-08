@@ -3,7 +3,6 @@ package ru.cherepanov.apps.dictionary.data
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
-import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.data.db.*
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
@@ -54,7 +53,7 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
 
     override fun getFullDefById(id: DefId): Maybe<WordDef> {
         return with(id.mapToEntityId()) {
-            dao.getFullDefById(
+            dao.getWordDefById(
                 title,
                 langNum,
                 senseNum,

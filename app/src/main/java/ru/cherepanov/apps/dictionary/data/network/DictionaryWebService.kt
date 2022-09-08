@@ -12,13 +12,13 @@ interface DictionaryWebService {
     ): Single<List<String>>
 
     @GET("/getShortGlossList/{title}")
-    fun getShortGlossList(
+    fun getShortDefsByTitle(
         @Path("title")
         title: String
     ): Single<List<WordDefDto>>
 
     @GET("/getFullGloss/{title}/{langNum}/{senseNum}/{glossNum}")
-    fun getFullGloss(
+    fun getFullDefById(
         @Path("title")
         title: String,
         @Path("langNum")
@@ -30,7 +30,7 @@ interface DictionaryWebService {
     ): Single<WordDefDto>
 
     @GET("/getShortGlossListByRandomTitle")
-    fun getShortGlossListByRandomTitle(
+    fun getRandonWordShortDefs(
     ): Single<List<WordDefDto>>
 
     @GET("/findSimilarWordTitles/{searchTerm}")

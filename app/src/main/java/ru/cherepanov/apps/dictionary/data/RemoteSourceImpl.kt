@@ -20,20 +20,20 @@ class RemoteSourceImpl @Inject constructor(private val webService: DictionaryWeb
         return webService.findSimilarWordTitles(searchTerm)
     }
 
-    override fun getShortGlossList(
+    override fun getShortDefsByTitle(
         title: String
     ): Single<List<WordDef>> {
-        return webService.getShortGlossList(title).map { it.map(WordDefDto::mapToShortDef) }
+        return webService.getShortDefsByTitle(title).map { it.map(WordDefDto::mapToShortDef) }
     }
 
-    override fun getFullGloss(id: DefId): Single<WordDef> {
+    override fun getFullDefById(id: DefId): Single<WordDef> {
         return with(id) {
-            webService.getFullGloss(title, langNum ?: 0, senseNum ?: 0, glossNum ?: 0)
+            webService.getFullDefById(title, langNum ?: 0, senseNum ?: 0, glossNum ?: 0)
                 .map { it.mapToFullDef() }
         }
     }
 
-    override fun getShortGlossListByRandomTitle(): Single<List<WordDef>> {
-        return webService.getShortGlossListByRandomTitle().map { it.map(WordDefDto::mapToShortDef) }
+    override fun getRandomWordShortDefs(): Single<List<WordDef>> {
+        return webService.getRandonWordShortDefs().map { it.map(WordDefDto::mapToShortDef) }
     }
 }
