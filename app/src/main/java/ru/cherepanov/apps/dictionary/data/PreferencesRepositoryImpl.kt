@@ -23,9 +23,6 @@ class PreferencesRepositoryImpl @Inject constructor(@ApplicationContext context:
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val filter: Observable<Filter> = dataStore.data()
-        .doOnSubscribe {
-            println()
-        }
         .filter {
             it.contains(KEY_FILTER)
         }.map {

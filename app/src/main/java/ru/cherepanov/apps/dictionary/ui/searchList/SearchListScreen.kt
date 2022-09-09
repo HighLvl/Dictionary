@@ -1,36 +1,32 @@
 package ru.cherepanov.apps.dictionary.ui.searchList
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.core.AnimationState
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateTo
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.ui.base.composable.*
+import ru.cherepanov.apps.dictionary.ui.base.composable.LoadingError
+import ru.cherepanov.apps.dictionary.ui.base.composable.ProgressBar
+import ru.cherepanov.apps.dictionary.ui.base.composable.StatusScaffold
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
 
+private const val TOP_APPBAR_HEIGHT = 64
 
 @Composable
 fun SearchListScreen(
@@ -70,7 +66,6 @@ private fun SearchListScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchListScreen(
     modifier: Modifier,
@@ -83,61 +78,61 @@ private fun SearchListScreen(
     onRemoveFromFavorites: (DefId) -> Unit,
     onRetry: () -> Unit
 ) {
-    var offset by remember {
-        mutableStateOf(0f)
-    }
-    val scrollBehaviour = rememberScrollBehaviour(onContentOffsetChange = { offset = it })
-    StatusScaffold(
-        modifier = modifier.nestedScroll(scrollBehaviour.nestedScrollConnection),
-        status = uiState.status,
-        topBar = {
-            Column {
-                TitleTopBar(titleResId = R.string.search_label,
-                    navigationIcon = {
-                        onBackPressed?.let { BackButton(onBackPressed = it) }
+    val scrollState = rememberLazyListState()
+    val collapsingToolbarState = rememberToolbarState(
+        height = with(LocalDensity.current) {
+            TOP_APPBAR_HEIGHT.dp.toPx()
+        }
+    )
+    CollapsingToolbarScaffold(
+        toolbarState = collapsingToolbarState,
+        modifier = modifier,
+        scrollableState = scrollState,
+        toolBar = {
+            SearchBar(
+                title = uiState.title,
+                hintResId = R.string.search_hint,
+                onClick = onShowSearch
+            )
+        }
+    ) {
+        StatusScaffold(
+            status = uiState.status,
+            floatingActionButton = {
+                RandomWordFloatingButton(
+                    modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
+                    onClick = {
+                        onLoadRandomWord()
+                        collapsingToolbarState.expand()
                     }
                 )
-                SearchBar(
-                    title = uiState.title,
-                    hintResId = R.string.search_hint,
-                    onClick = onShowSearch,
-                    scrollBehaviour = scrollBehaviour,
-                    contentOffset = with(LocalDensity.current) { offset.toDp() }
-                )
-            }
-        },
-        floatingActionButton = {
-            RandomWordFloatingButton(
-                modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
-                onClick = onLoadRandomWord
-            )
-        },
-        onSuccess = { contentPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .fillMaxSize()
-            ) {
+            },
+            onSuccess = { contentPadding ->
                 ShortDefContent(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .padding(contentPadding)
+                        .fillMaxSize(),
+                    topContentPadding = TOP_APPBAR_HEIGHT.dp,
                     bottomContentPadding = 80.dp,
+                    scrollState = scrollState,
                     shortDefs = uiState.shortDefs,
                     addToFavorites = onAddToFavorites,
                     removeFromFavorites = onRemoveFromFavorites,
                     onClick = onSelectShortDef,
                     bringIntoViewShortDefId = uiState.defId
                 )
+            },
+            onLoading = { contentPadding ->
+                ProgressBar(modifier = Modifier.padding(contentPadding))
+            },
+            onError = {
+                LoadingError(
+                    modifier = Modifier.padding(it), retry = onRetry
+                )
             }
-        },
-        onLoading = { contentPadding ->
-            ProgressBar(modifier = Modifier.padding(contentPadding))
-        },
-        onError = {
-            LoadingError(
-                modifier = Modifier.padding(it), retry = onRetry
-            )
-        }
-    )
+        )
+    }
+
 }
 
 @Composable
@@ -153,31 +148,18 @@ private fun RandomWordFloatingButton(modifier: Modifier, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SearchBar(
     modifier: Modifier = Modifier,
     title: String,
     hintResId: Int,
-    onClick: () -> Unit,
-    scrollBehaviour: TopAppBarScrollBehavior? = null,
-    contentOffset: Dp
+    onClick: () -> Unit
 ) {
-    SmallTopAppBar(
+    SearchButton(
         modifier = modifier,
-        title = {},
-        actions = {
-            SearchButton(
-                modifier = Modifier
-                    .offset(y = contentOffset)
-                    .padding(start = 4.dp)
-                    .padding(4.dp),
-                title = title,
-                hintResId = hintResId,
-                onClick = onClick
-            )
-        },
-        scrollBehavior = scrollBehaviour
+        title = title,
+        hintResId = hintResId,
+        onClick = onClick
     )
 }
 
@@ -191,9 +173,12 @@ private fun SearchButton(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier = modifier.height(IntrinsicSize.Min),
+        modifier = modifier
+            .height(TOP_APPBAR_HEIGHT.dp)
+            .padding(8.dp),
         onClick = onClick,
-        shadowElevation = 4.dp
+        shadowElevation = 8.dp,
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.Start
@@ -211,7 +196,6 @@ private fun SearchButton(
                     .padding(end = 32.dp)
             ) {
                 Text(
-
                     text = title.ifBlank { stringResource(id = hintResId) },
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Medium
@@ -220,79 +204,5 @@ private fun SearchButton(
             }
 
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun rememberScrollBehaviour(onContentOffsetChange: (Float) -> Unit): TopAppBarScrollBehavior {
-    val appBarState = rememberTopAppBarState()
-
-    val scrollBehaviour = remember {
-        object : TopAppBarScrollBehavior {
-            override val isPinned: Boolean = false
-            override val nestedScrollConnection =
-                SearchBarScrollConnection(appBarState, onContentOffsetChange)
-            override val state: TopAppBarState = appBarState
-        }
-    }
-    return scrollBehaviour
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-private class SearchBarScrollConnection(
-    private val state: TopAppBarState,
-    private val onContentOffsetChange: (Float) -> Unit
-) : NestedScrollConnection {
-    private var isAnimationRunning = false
-
-    override fun onPreScroll(
-        available: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        if (isAnimationRunning) return Offset.Zero
-        state.heightOffset += available.y
-        updateContentOffset()
-        return if (state.heightOffset == 0f || state.heightOffset == state.heightOffsetLimit) {
-            Offset.Zero
-        } else {
-            available.copy(x = 0f)
-        }
-    }
-
-    private fun updateContentOffset() {
-        val newOffset = (state.heightOffset / 2).coerceIn(state.heightOffsetLimit, 0f)
-        onContentOffsetChange(newOffset)
-    }
-
-    override suspend fun onPostFling(
-        consumed: Velocity,
-        available: Velocity
-    ): Velocity {
-        if (isAnimationRunning ||
-            state.heightOffset == state.heightOffsetLimit ||
-            state.heightOffset == 0f
-        ) {
-            return Velocity.Zero
-        }
-        isAnimationRunning = true
-        AnimationState(initialValue = state.heightOffset).animateTo(
-            targetValue = if (state.collapsedFraction > scrollUpCollapsedFraction)
-                state.heightOffsetLimit else 0f,
-            animationSpec = tween(
-                durationMillis = animationDurationMillis,
-                easing = LinearOutSlowInEasing
-            )
-        ) {
-            state.heightOffset = value
-            updateContentOffset()
-        }
-        isAnimationRunning = false
-        return Velocity.Zero
-    }
-
-    private companion object {
-        private const val scrollUpCollapsedFraction = 0.5f
-        private const val animationDurationMillis = 150
     }
 }

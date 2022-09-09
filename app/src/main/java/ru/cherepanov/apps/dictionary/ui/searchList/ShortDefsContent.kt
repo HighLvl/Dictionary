@@ -2,7 +2,7 @@ package ru.cherepanov.apps.dictionary.ui.searchList
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,14 +32,15 @@ import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDef
 @Composable
 fun ShortDefContent(
     modifier: Modifier,
+    topContentPadding: Dp,
     bottomContentPadding: Dp,
+    scrollState: LazyListState,
     shortDefs: List<FormattedWordDef>,
     addToFavorites: (DefId) -> Unit,
     removeFromFavorites: (DefId) -> Unit,
     onClick: (DefId) -> Unit = {},
     bringIntoViewShortDefId: DefId? = null
 ) {
-    val scrollState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var isBroughtIntoView by rememberSaveable(bringIntoViewShortDefId) {
         mutableStateOf(false)
@@ -59,7 +60,10 @@ fun ShortDefContent(
     DefList(
         modifier = modifier,
         scrollState = scrollState,
-        contentPadding = PaddingValues(top = 8.dp, bottom = bottomContentPadding),
+        contentPadding = PaddingValues(
+            top = 8.dp + topContentPadding,
+            bottom = bottomContentPadding
+        ),
         shortDefs = shortDefs
     ) {
         ShortDefItem(
