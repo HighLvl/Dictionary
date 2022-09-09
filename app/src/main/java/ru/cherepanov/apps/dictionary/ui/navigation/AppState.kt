@@ -70,7 +70,7 @@ class AppState(
     }
 
     fun navigateToSearchInitially(searchTerm: String?) {
-        navController.popBackStack("home", true)
+        navController.popBackStack(Destinations.Home.route, true)
         if (searchTerm == null) {
             val route = Destinations.SearchList.getRoute(SearchListArgs())
             navController.navigate(route)

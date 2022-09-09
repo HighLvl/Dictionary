@@ -76,7 +76,7 @@ private fun NavGraphBuilder.mainGraph(
     onShowSearch: (String) -> Unit,
     isBackButtonGone: (NavBackStackEntry) -> Boolean
 ) {
-    navigation(startDestination = "home", Sections.Main.route) {
+    navigation(startDestination = Destinations.Home.route, Sections.Main.route) {
         addHomeDestination(navigateToSearch, searchTerm)
         addSearchListDestination(
             contentPadding,
@@ -98,7 +98,7 @@ private fun NavGraphBuilder.addHomeDestination(
     navigateToSearch: (String?) -> Unit,
     searchTerm: String?
 ) {
-    composable("home") {
+    composable(Destinations.Home.route) {
         LaunchedEffect(Unit) {
             navigateToSearch(searchTerm)
         }

@@ -18,6 +18,7 @@ sealed class Destinations<T : Arguments>(
         return "$root/${nullSafeArgs.encodeToString()}"
     }
 
+    object Home : Destinations<NoArgs>(root = "home")
     object Search : Destinations<SearchArgs>(root = "search")
     object SearchList : Destinations<SearchListArgs>(root = "searchList")
     object Favorites : Destinations<NoArgs>(root = "favoritesList")
