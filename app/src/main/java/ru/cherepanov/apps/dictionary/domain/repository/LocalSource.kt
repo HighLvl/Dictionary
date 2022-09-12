@@ -6,10 +6,11 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
+import ru.cherepanov.apps.dictionary.domain.model.WordDefRemoteData
 
 interface LocalSource {
-    fun cache(wordDefs: List<WordDef>)
-    fun cache(wordDef: WordDef)
+    fun cache(wordDefs: List<WordDefRemoteData>): Completable
+    fun cache(wordDef: WordDefRemoteData): Completable
     fun getByIdFlowable(id: DefId): Flowable<WordDef>
     fun setFavorite(id: DefId, value: Boolean): Completable
     fun getAllByTitle(title: String): Flowable<List<WordDef>>

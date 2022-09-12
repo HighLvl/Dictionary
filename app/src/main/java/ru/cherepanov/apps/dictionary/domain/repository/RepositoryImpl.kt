@@ -2,7 +2,6 @@ package ru.cherepanov.apps.dictionary.domain.repository
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Filter
@@ -14,30 +13,26 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
     override fun getRandomWordShortDefs(): Flowable<List<WordDef>> =
         remoteSource.getRandomWordShortDefs()
             .flatMap { shortDefs ->
-                val title = shortDefs.first().id.title
+                val title = shortDefs.first().title
                 localSource.isShortDefsCached(title)
                     .switchIfEmpty(
-                        Maybe.fromCallable {
-                            localSource.cache(shortDefs)
-                            true
-                        }
-                    )
-                    .map { title }
-                    .toSingle()
+                        localSource.cache(shortDefs).toSingleDefault(true)
+                    ).map { title }
             }
             .toFlowable()
             .switchMap {
                 localSource.getAllByTitle(it)
+            }.doOnError {
+                println(it)
             }
 
     override fun getShortDefsByTitle(title: String): Flowable<List<WordDef>> =
         localSource.isShortDefsCached(title)
             .switchIfEmpty(
                 remoteSource.getShortDefsByTitle(title)
-                    .map { shortDefs ->
-                        localSource.cache(shortDefs)
-                        true
-                    }.toMaybe()
+                    .flatMap { shortDefs ->
+                        localSource.cache(shortDefs).toSingleDefault(true)
+                    }
             )
             .toFlowable()
             .switchMap {
@@ -48,10 +43,9 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
         localSource.setFavorite(id, true).andThen(
             localSource.isFullDefCached(id)
                 .switchIfEmpty(
-                    remoteSource.getFullDefById(id).map { fullDef ->
-                        localSource.cache(fullDef)
-                        true
-                    }.onErrorReturnItem(false).toMaybe()
+                    remoteSource.getFullDefById(id).flatMap { fullDef ->
+                        localSource.cache(fullDef).toSingleDefault(true)
+                    }.onErrorReturnItem(false)
                 ).ignoreElement()
         )
 
@@ -66,13 +60,13 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
     }
 
     override fun getFullDefById(id: DefId): Flowable<WordDef> =
-        localSource.getFullDefById(id)
+        localSource.isFullDefCached(id)
             .switchIfEmpty(
                 remoteSource.getFullDefById(id)
-                    .map { fullDef ->
-                        localSource.cache(fullDef)
-                        fullDef
-                    }.onErrorReturn { WordDef(id = id, isFull = false) }
+                    .flatMap { fullDef ->
+                        localSource.cache(fullDef).toSingleDefault(true)
+                    }
+                    .onErrorReturnItem(false)
             )
             .toFlowable()
             .switchMap {

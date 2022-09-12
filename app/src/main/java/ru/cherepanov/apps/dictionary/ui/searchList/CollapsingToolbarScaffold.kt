@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.ui.searchList
 
+import android.os.Parcelable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import kotlinx.parcelize.Parcelize
 
 @Composable
 @Preview
@@ -99,14 +102,14 @@ fun CollapsingToolbarScaffold(
 fun rememberToolbarState(
     height: Float,
     initialState: ToolbarState.State = ToolbarState.State.EXPANDED
-) = remember {
-    ToolbarState(height, initialState)
-}
+) = rememberSaveable { ToolbarState(height, initialState) }
 
+
+@Parcelize
 class ToolbarState(
-    height: Float,
-    initialState: State
-) {
+    private val height: Float,
+    private val initialState: State
+) : Parcelable {
     val offsetLimit: Float = -height
 
     var offset by mutableStateOf(

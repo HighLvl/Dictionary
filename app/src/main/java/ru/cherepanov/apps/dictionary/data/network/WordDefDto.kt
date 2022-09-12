@@ -2,8 +2,7 @@ package ru.cherepanov.apps.dictionary.data.network
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.domain.model.WordDef
+import ru.cherepanov.apps.dictionary.domain.model.WordDefRemoteData
 
 @Serializable
 data class WordDefDto(
@@ -42,47 +41,19 @@ data class WordDefDto(
     val ipa: String? = null
 )
 
-fun WordDefDto.mapToFullDef(): WordDef {
-    return WordDef(
-        id = DefId(
-            title = title,
-            langNum = langNum,
-            senseNum = senseNum,
-            glossNum = glossNum
-        ),
+fun WordDefDto.mapToWordDefRemoteData(): WordDefRemoteData =
+    WordDefRemoteData(
+        title = title,
         syllables = syllables,
-        gloss = gloss,
+        lang = lang,
+        langNum = langNum,
+        senseNum = senseNum,
+        glossNum = glossNum,
         pos = pos,
+        gloss = gloss,
         examples = examples,
         synonyms = synonyms,
         antonyms = antonyms,
-        hypernyms = hypernyms,
         hyponyms = hyponyms,
-        etymology = etymology,
-        phras = phras,
-        ipa = ipa,
-        lang = lang,
-        isFavorite = false,
-        isFull = true
+        hypernyms = hypernyms
     )
-}
-
-fun WordDefDto.mapToShortDef(): WordDef {
-    return WordDef(
-        id = DefId(
-            title = title,
-            langNum = langNum,
-            senseNum = senseNum,
-            glossNum = glossNum
-        ),
-        syllables = syllables,
-        gloss = gloss,
-        pos = pos,
-        examples = examples,
-        synonyms = synonyms,
-        antonyms = antonyms,
-        lang = lang,
-        isFavorite = false,
-        isFull = false
-    )
-}
