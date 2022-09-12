@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BackButton(onBackPressed: () -> Unit) {
+fun BackButton(modifier: Modifier = Modifier, onBackPressed: () -> Unit) {
     IconButton(
-        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+        modifier = modifier.padding(start = 8.dp, end = 8.dp),
         onClick = onBackPressed
     ) {
         Icon(

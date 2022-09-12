@@ -30,17 +30,15 @@ import kotlinx.parcelize.Parcelize
 private fun Preview() {
     val scrollState = rememberLazyListState()
     val toolbarState = rememberToolbarState(height = with(LocalDensity.current) { 60.dp.toPx() })
-    CollapsingToolbarScaffold(
+    val scrollConnection = rememberCollapsingToolbarConnection(
         toolbarState = toolbarState,
-        scrollableState = scrollState,
-        toolBar = {
-            Box(
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(60.dp)
-                    .background(Color.Blue)
-            )
-        }
+        scrollableState = scrollState
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollConnection)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -62,39 +60,31 @@ private fun Preview() {
                 }
             }
         }
+
+        CollapsingToolbar(
+            modifier = Modifier.align(Alignment.TopCenter),
+            toolbarState = toolbarState,
+            toolBar = {
+                Box(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(60.dp)
+                        .background(Color.Blue)
+                )
+            }
+        )
     }
 }
 
 @Composable
-fun CollapsingToolbarScaffold(
-    toolbarState: ToolbarState,
+fun CollapsingToolbar(
     modifier: Modifier = Modifier,
-    scrollableState: ScrollableState,
-    toolBar: @Composable () -> Unit,
-    content: @Composable () -> Unit
+    toolbarState: ToolbarState,
+    toolBar: @Composable () -> Unit
 ) {
-    val scrollConnection = rememberCollapsingToolbarConnection(
-        toolbarState = toolbarState,
-        scrollableState = scrollableState
-    )
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(scrollConnection)
-    ) {
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            content()
-        }
-
-        Box(modifier = Modifier
-            .align(Alignment.TopCenter)
-            .offset { IntOffset(0, toolbarState.offset.toInt()) }) {
-            toolBar()
-        }
+    Box(modifier = modifier
+        .offset { IntOffset(0, toolbarState.offset.toInt()) }) {
+        toolBar()
     }
 }
 

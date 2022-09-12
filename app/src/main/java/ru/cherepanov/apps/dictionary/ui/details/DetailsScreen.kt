@@ -65,8 +65,8 @@ private fun DefDetailsScreen(
                 )
             }
         },
-        onSuccess = { contentPadding ->
-            Column(modifier = Modifier.padding(contentPadding)) {
+        onSuccess = {
+            Column {
                 DefDetailsMainContent(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -80,11 +80,11 @@ private fun DefDetailsScreen(
                 }
             }
         },
-        onLoading = { contentPadding ->
-            ProgressBar(modifier = Modifier.padding(contentPadding))
+        onLoading = {
+            ProgressBar()
         },
         onError = {
-            LoadingError(modifier = Modifier.padding(it), retry = viewModel::retry)
+            LoadingError(retry = viewModel::retry)
         }
     )
 }

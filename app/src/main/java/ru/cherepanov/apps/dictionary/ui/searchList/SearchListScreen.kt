@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -21,12 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.ui.base.composable.LoadingError
-import ru.cherepanov.apps.dictionary.ui.base.composable.ProgressBar
-import ru.cherepanov.apps.dictionary.ui.base.composable.StatusScaffold
+import ru.cherepanov.apps.dictionary.ui.base.TOP_APPBAR_HEIGHT
+import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
-
-private const val TOP_APPBAR_HEIGHT = 64
 
 @Composable
 fun SearchListScreen(
@@ -84,55 +82,67 @@ private fun SearchListScreen(
             TOP_APPBAR_HEIGHT.dp.toPx()
         }
     )
-    CollapsingToolbarScaffold(
+    val scrollConnection = rememberCollapsingToolbarConnection(
         toolbarState = collapsingToolbarState,
-        modifier = modifier,
-        scrollableState = scrollState,
-        toolBar = {
-            SearchBar(
-                title = uiState.title,
-                hintResId = R.string.search_hint,
-                onClick = onShowSearch
-            )
-        }
-    ) {
-        StatusScaffold(
-            status = uiState.status,
-            floatingActionButton = {
-                RandomWordFloatingButton(
-                    modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
-                    onClick = {
-                        onLoadRandomWord()
-                        collapsingToolbarState.expand()
-                    }
-                )
-            },
-            onSuccess = { contentPadding ->
-                ShortDefContent(
-                    modifier = Modifier
-                        .padding(contentPadding)
-                        .fillMaxSize(),
-                    topContentPadding = TOP_APPBAR_HEIGHT.dp,
-                    bottomContentPadding = 80.dp,
-                    scrollState = scrollState,
-                    shortDefs = uiState.shortDefs,
-                    addToFavorites = onAddToFavorites,
-                    removeFromFavorites = onRemoveFromFavorites,
-                    onClick = onSelectShortDef,
-                    bringIntoViewShortDefId = uiState.defId
-                )
-            },
-            onLoading = { contentPadding ->
-                ProgressBar(modifier = Modifier.padding(contentPadding))
-            },
-            onError = {
-                LoadingError(
-                    modifier = Modifier.padding(it), retry = onRetry
-                )
-            }
-        )
-    }
+        scrollableState = scrollState
+    )
 
+    StatusScaffold(
+        modifier = modifier,
+        status = uiState.status,
+        floatingActionButton = {
+            RandomWordFloatingButton(
+                modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
+                onClick = {
+                    onLoadRandomWord()
+                    collapsingToolbarState.expand()
+                }
+            )
+        },
+        topBar = {
+            TitleTopBar(
+                titleResId = R.string.search_label,
+                navigationIcon = {
+                    onBackPressed?.let {
+                        BackButton(onBackPressed = it)
+                    }
+                }
+            )
+        },
+        toolBar = {
+            CollapsingToolbar(
+                toolbarState = collapsingToolbarState,
+                toolBar = {
+                    SearchBar(
+                        title = uiState.title,
+                        hintResId = R.string.search_hint,
+                        onClick = onShowSearch
+                    )
+                }
+            )
+        },
+        onSuccess = {
+            ShortDefContent(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollConnection),
+                topContentPadding = TOP_APPBAR_HEIGHT.dp,
+                bottomContentPadding = 80.dp,
+                scrollState = scrollState,
+                shortDefs = uiState.shortDefs,
+                addToFavorites = onAddToFavorites,
+                removeFromFavorites = onRemoveFromFavorites,
+                onClick = onSelectShortDef,
+                bringIntoViewShortDefId = uiState.defId
+            )
+        },
+        onLoading = {
+            ProgressBar()
+        },
+        onError = {
+            LoadingError(retry = onRetry)
+        }
+    )
 }
 
 @Composable
@@ -146,6 +156,16 @@ private fun RandomWordFloatingButton(modifier: Modifier, onClick: () -> Unit) {
             contentDescription = null
         )
     }
+}
+
+
+@Composable
+@Preview
+private fun SearchBarPreview() {
+    SearchBar(title = "Title",
+        hintResId = R.string.search_hint,
+        onClick = {}
+    )
 }
 
 @Composable
@@ -175,34 +195,27 @@ private fun SearchButton(
     Surface(
         modifier = modifier
             .height(TOP_APPBAR_HEIGHT.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .fillMaxWidth(),
         onClick = onClick,
         shadowElevation = 8.dp,
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 8.dp, end = 8.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                 imageVector = Icons.Filled.Search,
                 contentDescription = null
             )
-            Column(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(end = 32.dp)
-            ) {
-                Text(
-                    text = title.ifBlank { stringResource(id = hintResId) },
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Divider(thickness = 1.dp)
-            }
-
+            Text(
+                modifier = Modifier.padding(end = 32.dp),
+                text = title.ifBlank { stringResource(id = hintResId) },
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }

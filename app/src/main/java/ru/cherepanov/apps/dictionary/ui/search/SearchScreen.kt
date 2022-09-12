@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.Filter
+import ru.cherepanov.apps.dictionary.ui.base.TOP_APPBAR_HEIGHT
 import ru.cherepanov.apps.dictionary.ui.base.composable.BackButton
 import ru.cherepanov.apps.dictionary.ui.base.composable.LoadingError
 import ru.cherepanov.apps.dictionary.ui.base.composable.StatusScaffold
@@ -75,8 +76,8 @@ private fun SearchScreen(
                 onBackPressed = onBackPressed
             )
         },
-        onSuccess = { contentPadding ->
-            LazyColumn(modifier = Modifier.padding(contentPadding)) {
+        onSuccess = {
+            LazyColumn {
                 items(uiState.suggestions) { suggestion ->
                     SuggestionItem(suggestion, onClick = { onSelectSuggestion(suggestion) })
                 }
@@ -84,7 +85,6 @@ private fun SearchScreen(
         },
         onError = {
             LoadingError(
-                modifier = Modifier.padding(it),
                 retry = viewModel::retry
             )
         }
@@ -127,7 +127,19 @@ private fun SuggestionItem(suggestion: String, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+@Preview
+private fun SearchBarPreview() {
+    SearchBar(
+        searchTerm = "search kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+        filterState = FilterState(),
+        onChangeFilterState = { },
+        isLoading = true,
+        onValueChange = {},
+        onBackPressed = {}
+    )
+}
+
 @Composable
 private fun SearchBar(
     searchTerm: String,
@@ -137,25 +149,40 @@ private fun SearchBar(
     onValueChange: (String) -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    Column {
-        SmallTopAppBar(
-            navigationIcon = {
-                BackButton(
-                    onBackPressed = onBackPressed
-                )
-            },
-            actions = {
-                SearchTextField(
-                    initialText = searchTerm,
-                    isLoading = isLoading,
-                    onValueChange = onValueChange
-                )
-                Filter(
-                    state = filterState,
-                    onChangeState = onChangeFilterState
-                )
-            },
-            title = {})
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .height(TOP_APPBAR_HEIGHT.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BackButton(
+                onBackPressed = onBackPressed
+            )
+            SearchTextField(
+                modifier = Modifier.weight(1f),
+                initialText = searchTerm,
+                onValueChange = onValueChange
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier.size(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Filter(
+                state = filterState,
+                onChangeState = onChangeFilterState
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+        }
         Divider(thickness = 1.dp)
     }
 
@@ -164,8 +191,8 @@ private fun SearchBar(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun SearchTextField(
+    modifier: Modifier,
     initialText: String,
-    isLoading: Boolean,
     onValueChange: (String) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -186,33 +213,23 @@ private fun SearchTextField(
         keyboardShowed = true
     }
 
-    Box {
-        TextField(
-            modifier = Modifier.focusRequester(focusRequester),
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-                onValueChange(it.text)
-            },
-            singleLine = true,
-            placeholder = {
-                Text(text = stringResource(id = R.string.search_hint))
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Unspecified,
-                unfocusedIndicatorColor = Color.Unspecified,
-                focusedIndicatorColor = Color.Unspecified
-            )
+    TextField(
+        modifier = modifier.focusRequester(focusRequester),
+        value = textFieldValue,
+        onValueChange = {
+            textFieldValue = it
+            onValueChange(it.text)
+        },
+        singleLine = true,
+        placeholder = {
+            Text(text = stringResource(id = R.string.search_hint))
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            containerColor = Color.Unspecified,
+            unfocusedIndicatorColor = Color.Unspecified,
+            focusedIndicatorColor = Color.Unspecified
         )
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(24.dp),
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-    }
+    )
 }
 
 @Composable
@@ -229,10 +246,14 @@ private fun FilterPreview() {
 }
 
 @Composable
-private fun Filter(state: FilterState, onChangeState: (FilterState) -> Unit) {
+private fun Filter(
+    modifier: Modifier = Modifier,
+    state: FilterState,
+    onChangeState: (FilterState) -> Unit
+) {
     var showFilterMenu by rememberSaveable { mutableStateOf(false) }
 
-    Box {
+    Box(modifier = modifier) {
         IconButton(onClick = { showFilterMenu = !showFilterMenu }) {
             Icon(imageVector = Icons.Filled.FilterList, contentDescription = null)
         }

@@ -22,4 +22,6 @@
     <string name="search_mode_label">Режим поиска:</string>
     <string name="search_mode_fuzzy">Нечеткий</string>
     <string name="search_mode_prefix">Префикс</string>
+    <string name="loading_error_msg">Ошибка получения данных</string>
+    <string name="refresh_msg">Обновить</string>
 </resources>

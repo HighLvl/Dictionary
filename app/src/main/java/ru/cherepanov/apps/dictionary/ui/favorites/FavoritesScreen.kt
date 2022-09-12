@@ -43,8 +43,8 @@ private fun FavoritesScreen(
     val uiState by viewModel.uiState.observeUiState()
 
     StatusScaffold(
-        status = uiState.status,
         modifier = modifier,
+        status = uiState.status,
         topBar = {
             TitleTopBar(
                 titleResId = R.string.favorites_label,
@@ -55,7 +55,6 @@ private fun FavoritesScreen(
         },
         onSuccess = {
             FavoritesContent(
-                modifier = Modifier.padding(it),
                 shortDefs = uiState.favorites,
                 onRemoveFromFavorites = viewModel::onRemoveFromFavorites
             ) { id ->
@@ -63,14 +62,14 @@ private fun FavoritesScreen(
             }
         },
         onLoading = {
-            ProgressBar(modifier = Modifier.padding(it))
+            ProgressBar()
         }
     )
 }
 
 @Composable
 private fun FavoritesContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     shortDefs: List<FormattedWordDef>,
     onRemoveFromFavorites: (DefId) -> Unit,
     onClick: (DefId) -> Unit = {},
