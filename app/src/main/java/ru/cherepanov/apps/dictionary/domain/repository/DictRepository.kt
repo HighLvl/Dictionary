@@ -2,6 +2,7 @@ package ru.cherepanov.apps.dictionary.domain.repository
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Filter
@@ -11,11 +12,11 @@ abstract class DictRepository(
     protected val localSource: LocalSource,
     protected val remoteSource: RemoteSource
 ) {
-    abstract fun getRandomWordShortDefs(): Flowable<List<WordDef>>
-    abstract fun getShortDefsByTitle(title: String): Flowable<List<WordDef>>
+    abstract fun getRandomWordShortDefs(): Observable<List<WordDef>>
+    abstract fun getShortDefsByTitle(title: String): Observable<List<WordDef>>
     abstract fun addToFavorites(id: DefId): Completable
     abstract fun removeFromFavorites(id: DefId): Completable
     abstract fun findWordTitles(searchTerm: String, filter: Filter): Single<List<String>>
-    abstract fun getFullDefById(id: DefId): Flowable<WordDef>
-    abstract fun getFavorites(): Flowable<List<WordDef>>
+    abstract fun getFullDefById(id: DefId): Observable<WordDef>
+    abstract fun getFavorites(): Observable<List<WordDef>>
 }

@@ -17,7 +17,6 @@ class GetFullWordDef @Inject constructor(private val repository: DictRepository)
             .map {
                 it.toFormatted(isDetails = true)
             }.subscribeOn(Schedulers.io())
-            .toObservable()
     }
 
     data class Args(val defId: DefId)

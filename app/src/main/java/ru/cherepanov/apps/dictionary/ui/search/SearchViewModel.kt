@@ -64,7 +64,7 @@ class SearchViewModel @Inject constructor(
     private fun getSuggestionsOnSearchTermChange() {
         changeSearchTerm.observable()
             .subscribeAndObserveOnMainThread(disposables) { searchTerm ->
-                runRepeatable {
+                runRetriable {
                     getSuggestions(GetSuggestions.Args(searchTerm, state.filter))
                 }
             }
@@ -73,7 +73,7 @@ class SearchViewModel @Inject constructor(
     private fun getSuggestionsOnFilterChange() {
         getFilter.observable()
             .subscribeAndObserveOnMainThread(disposables) { filter ->
-                runRepeatable {
+                runRetriable {
                     getSuggestions(GetSuggestions.Args(state.searchTerm, filter))
                 }
             }

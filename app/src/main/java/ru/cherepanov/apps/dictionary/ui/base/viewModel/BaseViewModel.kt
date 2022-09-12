@@ -28,7 +28,7 @@ abstract class BaseViewModel<T : Any>(
             _uiState.value = value
         }
 
-    fun runRepeatable(callback: () -> Unit) {
+    fun runRetriable(callback: () -> Unit) {
         lastActionCallback = callback.also { it.invoke() }
     }
 

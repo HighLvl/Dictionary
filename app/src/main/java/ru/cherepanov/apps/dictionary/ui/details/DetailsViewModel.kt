@@ -48,7 +48,7 @@ class DetailsViewModel @Inject constructor(
             }
     }
 
-    private fun onLoadDetails(defId: DefId) = runRepeatable {
+    private fun onLoadDetails(defId: DefId) = runRetriable {
         getFullWordDef.invoke(GetFullWordDef.Args(defId))
     }
 

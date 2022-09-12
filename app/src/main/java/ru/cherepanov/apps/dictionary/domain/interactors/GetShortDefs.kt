@@ -31,7 +31,6 @@ class GetShortDefs @Inject constructor(private val repository: DictRepository) :
             }
         }
             .subscribeOn(Schedulers.io())
-            .toObservable()
     }
 
     data class Result(val shortDefs: List<FormattedWordDef>, val bringIntoView: DefId? = null)

@@ -1,8 +1,8 @@
 package ru.cherepanov.apps.dictionary.data
 
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
+import io.reactivex.Observable
 import ru.cherepanov.apps.dictionary.data.db.*
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
@@ -27,9 +27,9 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
         return Completable.fromCallable { dao.cache(wordDefEntity) }
     }
 
-    override fun getByIdFlowable(id: DefId): Flowable<WordDef> {
+    override fun getByIdObservable(id: DefId): Observable<WordDef> {
         return with(id.mapToEntityId()) {
-            dao.getByIdFlowable(
+            dao.getByIdObservable(
                 title,
                 langNum,
                 senseNum,
@@ -50,8 +50,8 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
         }
     }
 
-    override fun getAllByTitle(title: String): Flowable<List<WordDef>> {
-        return dao.getAllByTitleFlowable(title).map { it.map(WordDefEntity::mapToWordDef) }
+    override fun getAllByTitle(title: String): Observable<List<WordDef>> {
+        return dao.getAllByTitleObservable(title).map { it.map(WordDefEntity::mapToWordDef) }
     }
 
     override fun isShortDefsCached(title: String): Maybe<Boolean> {
@@ -69,7 +69,7 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
         }.map { it.mapToWordDef() }
     }
 
-    override fun getFavorites(): Flowable<List<WordDef>> {
+    override fun getFavorites(): Observable<List<WordDef>> {
         return dao.getFavorites().map { it.map(WordDefEntity::mapToWordDef) }
     }
 

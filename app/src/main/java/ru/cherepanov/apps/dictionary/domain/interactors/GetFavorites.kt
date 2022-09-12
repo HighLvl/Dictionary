@@ -16,6 +16,5 @@ class GetFavorites @Inject constructor(private val repository: DictRepository) :
             .map {
                 it.map(WordDef::toFormatted)
             }.subscribeOn(Schedulers.io())
-            .toObservable()
     }
 }

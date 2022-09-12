@@ -77,21 +77,21 @@ class SearchListViewModel @Inject constructor(
     }
 
     private fun onBringIntoView(id: DefId) {
-        runRepeatable {
+        runRetriable {
             setTitle(id.title)
             getShortDefs(GetShortDefs.Args(mode = GetShortDefs.Mode.BringIntoView(id)))
         }
     }
 
     private fun onLoadWordByTitle(title: String) {
-        runRepeatable {
+        runRetriable {
             setTitle(title)
             getShortDefs(GetShortDefs.Args(mode = GetShortDefs.Mode.ByTitle(title)))
         }
     }
 
     fun onLoadRandomWord() {
-        runRepeatable {
+        runRetriable {
             getShortDefs(GetShortDefs.Args(mode = GetShortDefs.Mode.Random))
         }
     }
