@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.data
 
+import androidx.paging.PagingSource
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -69,8 +70,8 @@ class LocalSourceImpl @Inject constructor(private val dao: DictDao) : LocalSourc
         }.map { it.mapToWordDef() }
     }
 
-    override fun getFavorites(): Observable<List<WordDef>> {
-        return dao.getFavorites().map { it.map(WordDefEntity::mapToWordDef) }
+    override fun getFavorites(): PagingSource<Int, WordDefEntity> {
+        return dao.getFavorites()
     }
 
     override fun isFullDefCached(id: DefId): Maybe<Boolean> {

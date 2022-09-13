@@ -1,8 +1,10 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
+import androidx.paging.PagingSource
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import ru.cherepanov.apps.dictionary.data.db.WordDefEntity
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.domain.model.WordDefRemoteData
@@ -15,6 +17,6 @@ interface LocalSource {
     fun getAllByTitle(title: String): Observable<List<WordDef>>
     fun isShortDefsCached(title: String): Maybe<Boolean>
     fun getFullDefById(id: DefId): Maybe<WordDef>
-    fun getFavorites(): Observable<List<WordDef>>
+    fun getFavorites(): PagingSource<Int, WordDefEntity>
     fun isFullDefCached(id: DefId): Maybe<Boolean>
 }

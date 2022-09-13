@@ -3,6 +3,7 @@ package ru.cherepanov.apps.dictionary.ui.searchList
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,22 +64,23 @@ fun ShortDefContent(
         contentPadding = PaddingValues(
             top = 8.dp + topContentPadding,
             bottom = bottomContentPadding
-        ),
-        shortDefs = shortDefs
+        )
     ) {
-        ShortDefItem(
-            modifier = Modifier
-                .padding(horizontal = 8.dp),
-            wordDef = it,
-            isFavoriteDef = { isFavorite ->
-                if (isFavorite) {
-                    addToFavorites(it.id)
-                } else {
-                    removeFromFavorites(it.id)
+        items(shortDefs, key = { it.id }) {
+            ShortDefItem(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
+                wordDef = it,
+                isFavoriteDef = { isFavorite ->
+                    if (isFavorite) {
+                        addToFavorites(it.id)
+                    } else {
+                        removeFromFavorites(it.id)
+                    }
                 }
-            }
-        ) { onClick(it.id) }
-        Spacer(modifier = Modifier.height(12.dp))
+            ) { onClick(it.id) }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
     }
 }
 

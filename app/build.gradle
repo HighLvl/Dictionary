@@ -82,6 +82,8 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
+
 
     def nav_version = "2.5.1"
     implementation "androidx.navigation:navigation-compose:$nav_version"
@@ -104,4 +106,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/androidx.datastore/datastore-preferences-rxjava2
     implementation 'androidx.datastore:datastore-preferences-rxjava2:1.0.0'
+
+    def paging_version = "3.1.1"
+    implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation "androidx.paging:paging-rxjava2:$paging_version"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha16"
 }

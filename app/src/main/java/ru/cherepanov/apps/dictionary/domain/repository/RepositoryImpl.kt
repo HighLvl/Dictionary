@@ -1,8 +1,10 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
+import androidx.paging.PagingSource
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import ru.cherepanov.apps.dictionary.data.db.WordDefEntity
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
@@ -69,7 +71,7 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
                 localSource.getByIdObservable(id)
             }
 
-    override fun getFavorites(): Observable<List<WordDef>> {
+    override fun getFavorites(): PagingSource<Int, WordDefEntity> {
         return localSource.getFavorites()
     }
 }

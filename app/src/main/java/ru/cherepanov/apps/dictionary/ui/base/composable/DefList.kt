@@ -11,16 +11,13 @@ fun DefList(
     modifier: Modifier = Modifier,
     scrollState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues,
-    shortDefs: List<FormattedWordDef>,
-    item: @Composable LazyItemScope.(FormattedWordDef) -> Unit
+    items: LazyListScope.() -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
         state = scrollState,
         contentPadding = contentPadding
     ) {
-        items(shortDefs, key = { it.id }) {
-            item(it)
-        }
+        items()
     }
 }

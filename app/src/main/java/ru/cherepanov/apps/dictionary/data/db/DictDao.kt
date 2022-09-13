@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.data.db
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -113,5 +114,5 @@ interface DictDao {
     }
 
     @Query("SELECT * FROM definitions WHERE isFavorite = 1 ORDER BY updatedAt DESC")
-    fun getFavorites(): Observable<List<WordDefEntity>>
+    fun getFavorites(): PagingSource<Int, WordDefEntity>
 }
