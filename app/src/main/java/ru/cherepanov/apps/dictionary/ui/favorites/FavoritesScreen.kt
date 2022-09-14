@@ -1,16 +1,16 @@
 package ru.cherepanov.apps.dictionary.ui.favorites
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -42,7 +42,7 @@ private fun FavoritesScreen(
     onItemSelected: (DefId) -> Unit,
     onBackPressed: (() -> Unit)
 ) {
-    val lazyShortDefItems = viewModel.pagingData.collectAsLazyPagingItems()
+    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
 
     Scaffold(
         modifier = modifier,
@@ -57,7 +57,7 @@ private fun FavoritesScreen(
     ) {
         FavoritesContent(
             modifier = Modifier.padding(it),
-            lazyShortDefItems = lazyShortDefItems,
+            lazyPagingItems = lazyPagingItems,
             onRemoveFromFavorites = viewModel::onRemoveFromFavorites,
             onClick = { id ->
                 onItemSelected(id)
@@ -66,40 +66,90 @@ private fun FavoritesScreen(
     }
 }
 
+
 @Composable
 private fun FavoritesContent(
     modifier: Modifier = Modifier,
-    lazyShortDefItems: LazyPagingItems<FormattedWordDef>,
+    lazyPagingItems: LazyPagingItems<FormattedWordDef>,
     onRemoveFromFavorites: (DefId) -> Unit,
     onClick: (DefId) -> Unit = {},
 ) {
     DefList(
         modifier = modifier,
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp),
+        scrollState = lazyPagingItems.rememberLazyListState()
     ) {
-        items(lazyShortDefItems) {
-            if (it == null) return@items
-            SwipeToRemove(onRemove = { onRemoveFromFavorites(it.id) }) {
-                FavoriteItem(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .fillMaxWidth(),
-                    shortDef = it,
-                    onClick = { onClick(it.id) }
-                )
+        if (lazyPagingItems.loadState.prepend == LoadState.Loading) {
+            item {
+                LoadingItem()
             }
-            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        items(
+            items = lazyPagingItems,
+            key = { it.id }
+        ) { favoriteItem ->
+            if (favoriteItem == null) {
+                LoadingItem()
+            } else {
+                SwipeToRemove(onRemove = { onRemoveFromFavorites(favoriteItem.id) }) {
+                    FavoriteItem(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .fillMaxWidth(),
+                        wordDef = favoriteItem,
+                        onClick = { onClick(favoriteItem.id) }
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+
+        if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
+            item {
+                ProgressBar(modifier = Modifier.fillParentMaxSize())
+            }
+        }
+        if (lazyPagingItems.loadState.append == LoadState.Loading) {
+            item {
+                LoadingItem()
+            }
         }
     }
+}
+
+
+@Composable
+fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
+    // After recreation, LazyPagingItems first return 0 items, then the cached items.
+    // This behavior/issue is resetting the LazyListState scroll position.
+    // Below is a workaround. More info: https://issuetracker.google.com/issues/177245496.
+    return when (itemCount) {
+        // Return a different LazyListState instance.
+        0 -> remember(this) { LazyListState(0, 0) }
+        // Return rememberLazyListState (normal case).
+        else -> androidx.compose.foundation.lazy.rememberLazyListState()
+    }
+}
+
+@Composable
+private fun LoadingItem() {
+    ProgressBar(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(vertical = 16.dp)
+    )
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FavoriteItem(
     modifier: Modifier = Modifier,
-    shortDef: FormattedWordDef,
+    wordDef: FormattedWordDef,
     onClick: () -> Unit = {}
-) = with(shortDef) {
+) = with(wordDef) {
     ElevatedCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),

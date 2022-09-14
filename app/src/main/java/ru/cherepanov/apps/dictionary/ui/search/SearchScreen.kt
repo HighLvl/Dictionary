@@ -131,7 +131,7 @@ private fun SuggestionItem(suggestion: String, onClick: () -> Unit) {
 @Preview
 private fun SearchBarPreview() {
     SearchBar(
-        searchTerm = "search kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+        searchTerm = "search",
         filterState = FilterState(),
         onChangeFilterState = { },
         isLoading = true,
