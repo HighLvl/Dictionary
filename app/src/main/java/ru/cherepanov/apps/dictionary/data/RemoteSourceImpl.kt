@@ -34,7 +34,7 @@ class RemoteSourceImpl @Inject constructor(private val webService: DictionaryWeb
     }
 
     override fun getRandomWordShortDefs(): Single<List<WordDefRemoteData>> {
-        return webService.getRandonWordShortDefs()
+        return webService.getRandomWordShortDefs()
             .map { it.map(WordDefDto::mapToWordDefRemoteData) }
     }
 }
