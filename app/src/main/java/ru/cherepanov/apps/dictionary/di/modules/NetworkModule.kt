@@ -65,6 +65,6 @@ class NetworkModule {
     }
 
     private companion object {
-        const val DICT_SERVICE_URL = "http://192.168.43.31:8000/"
+        const val DICT_SERVICE_URL = "http://18.184.158.90:8000/"
     }
 }
