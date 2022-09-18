@@ -31,7 +31,7 @@ fun SearchListScreen(
     modifier: Modifier = Modifier,
     onSelectShortDef: (DefId) -> Unit = {},
     onBackPressed: (() -> Unit)? = null,
-    onShowSearch: (String) -> Unit
+    onShowSearch: () -> Unit
 ) {
     SearchListScreen(
         modifier = modifier,
@@ -48,7 +48,7 @@ private fun SearchListScreen(
     viewModel: SearchListViewModel,
     onBackPressed: (() -> Unit)?,
     onSelectShortDef: (DefId) -> Unit,
-    onShowSearch: (String) -> Unit
+    onShowSearch: () -> Unit
 ) {
     val uiState by viewModel.uiState.observeUiState()
     SearchListScreen(
@@ -57,7 +57,7 @@ private fun SearchListScreen(
         onBackPressed = onBackPressed,
         onSelectShortDef = onSelectShortDef,
         onLoadRandomWord = viewModel::onLoadRandomWord,
-        onShowSearch = { onShowSearch(uiState.title) },
+        onShowSearch = onShowSearch,
         onAddToFavorites = viewModel::onAddToFavorites,
         onRemoveFromFavorites = viewModel::onRemoveFromFavorites,
         onRetry = viewModel::retry

@@ -5,7 +5,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class SearchArgs(val searchTerm: String = ""): Arguments() {
+data class SearchArgs(val searchTerm: String? = null): Arguments() {
     override fun encodeToString(): String {
         return Json.encodeToString(this)
     }

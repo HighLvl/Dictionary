@@ -55,5 +55,8 @@ fun WordDefDto.mapToWordDefRemoteData(): WordDefRemoteData =
         synonyms = synonyms,
         antonyms = antonyms,
         hyponyms = hyponyms,
-        hypernyms = hypernyms
+        hypernyms = hypernyms,
+        etymology = etymology,
+        phras = phras,
+        ipa = ipa
     )

@@ -5,10 +5,12 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
@@ -16,6 +18,7 @@ import ru.cherepanov.apps.dictionary.ui.base.composable.createTermToGlossString
 
 @Composable
 fun FormattedWordDef.getDetailsAnnotatedString() = buildAnnotatedString {
+    spacing(with(LocalDensity.current) { 8.dp.toSp() })
     Language(lang)
     PartOfSpeech(pos)
     SyllablesToGloss(syllables, id.title, gloss)
@@ -29,6 +32,7 @@ fun FormattedWordDef.getDetailsAnnotatedString() = buildAnnotatedString {
     Etymology(etymology)
     Phraseologisms(phras)
     Ipa(ipa)
+    spacing(with(LocalDensity.current) { 80.dp.toSp() })
 }
 
 @Composable

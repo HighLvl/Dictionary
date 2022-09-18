@@ -15,7 +15,7 @@ sealed class Destinations<T : Arguments>(
 
     fun getRoute(args: T? = null): String {
         val nullSafeArgs = args ?: NoArgs
-        return "$root/${nullSafeArgs.encodeToString()}"
+        return "$root/${nullSafeArgs.encodeToBase64String()}"
     }
 
     object Home : Destinations<NoArgs>(root = "home")

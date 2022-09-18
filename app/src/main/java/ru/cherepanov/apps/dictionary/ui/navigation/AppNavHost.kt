@@ -6,7 +6,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
@@ -23,7 +25,8 @@ import ru.cherepanov.apps.dictionary.ui.searchList.SearchListScreen
 fun AppNavHost(
     args: Args? = null,
     onArgsProcessed: () -> Unit,
-    appState: AppState = rememberAppState()
+    appState: AppState,
+    activityViewModelStoreOwner: ViewModelStoreOwner
 ) {
     if (args != null) {
         onArgsProcessed()
@@ -48,17 +51,18 @@ fun AppNavHost(
             mainGraph(
                 contentPadding = it,
                 onSelectShortDef = appState::navigateToDetails,
-                onBackPressed = appState::navigateUp,
+                onBackPressed = appState::back,
                 navigateToSearch = appState::navigateToSearchInitially,
                 searchTerm = args?.takeIf { it.isActivityArg }?.searchTerm,
                 onSelectWordSuggestion = { appState.navigateToSearchList(it) },
                 onShowSearch = appState::navigateToSearch,
-                isBackButtonGone = appState::isOnlyEntryInBackStack
+                isBackButtonGone = appState::isOnlyEntryInBackStack,
+                provideSearchViewModelStoreOwner =  { activityViewModelStoreOwner }
             )
             favoritesGraph(
                 contentPadding = it,
                 onItemSelected = { appState.navigateToSearchList(defId = it) },
-                onBackPressed = appState::navigateUp
+                onBackPressed = appState::back
             )
         }
     }
@@ -73,8 +77,9 @@ private fun NavGraphBuilder.mainGraph(
     navigateToSearch: (String?) -> Unit,
     searchTerm: String?,
     onSelectWordSuggestion: (String) -> Unit,
-    onShowSearch: (String) -> Unit,
-    isBackButtonGone: (NavBackStackEntry) -> Boolean
+    onShowSearch: () -> Unit,
+    isBackButtonGone: (NavBackStackEntry) -> Boolean,
+    provideSearchViewModelStoreOwner: () -> ViewModelStoreOwner
 ) {
     navigation(startDestination = Destinations.Home.route, Sections.Main.route) {
         addHomeDestination(navigateToSearch, searchTerm)
@@ -89,7 +94,8 @@ private fun NavGraphBuilder.mainGraph(
         addSearchDestination(
             contentPadding,
             onBackPressed,
-            onSelectWordSuggestion
+            onSelectWordSuggestion,
+            provideSearchViewModelStoreOwner
         )
     }
 }
@@ -121,7 +127,7 @@ private fun NavGraphBuilder.addSearchListDestination(
     contentPadding: PaddingValues,
     onSelectShortDef: (DefId) -> Unit,
     onBackPressed: () -> Unit,
-    onShowSearch: (String) -> Unit,
+    onShowSearch: () -> Unit,
     isBackButtonGone: (NavBackStackEntry) -> Boolean
 ) {
     composable(Destinations.SearchList.route) {
@@ -137,13 +143,18 @@ private fun NavGraphBuilder.addSearchListDestination(
 private fun NavGraphBuilder.addSearchDestination(
     contentPadding: PaddingValues,
     onBackPressed: () -> Unit,
-    onSelectSelectSuggestion: (String) -> Unit
+    onSelectSelectSuggestion: (String) -> Unit,
+    provideSearchViewModelStoreOwner: () -> ViewModelStoreOwner
 ) {
     composable(route = Destinations.Search.route) {
         SearchScreen(
             modifier = Modifier.padding(contentPadding),
+            arguments = it.arguments,
             onBackPressed = onBackPressed,
-            onSelectSuggestion = onSelectSelectSuggestion
+            onSelectSuggestion = onSelectSelectSuggestion,
+            viewModelStoreOwner = remember {
+                provideSearchViewModelStoreOwner()
+            }
         )
     }
 }

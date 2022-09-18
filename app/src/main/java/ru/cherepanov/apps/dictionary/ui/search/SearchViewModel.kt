@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.ui.search
 
+import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
@@ -11,6 +12,7 @@ import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.domain.model.Resource
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
+import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.Arguments
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchArgs
 import javax.inject.Inject
 
@@ -29,12 +31,13 @@ class SearchViewModel @Inject constructor(
     private val updateFilter: UpdateFilter
 ) : BaseViewModel<SearchState>(savedStateHandle, SearchState()) {
     private val changeSearchTerm = ValueInteractor<String>()
+    private val changeArgs = ValueInteractor<Bundle>()
 
     init {
         subscribeUiState()
         getSuggestionsOnFilterChange()
         getSuggestionsOnSearchTermChange()
-        onChangeSearchTerm(getArgs<SearchArgs>().searchTerm)
+        changeSearchTermOnNewArgs()
     }
 
     private fun subscribeUiState(
@@ -79,11 +82,26 @@ class SearchViewModel @Inject constructor(
             }
     }
 
+    private fun changeSearchTermOnNewArgs() {
+        changeArgs.observable()
+            .subscribeAndObserveOnMainThread(disposables) { arguments ->
+                val stringArgs = arguments.getString(Arguments.ARG_KEY)!!
+                val searchArgs = Arguments.decodeFromString<SearchArgs>(stringArgs)
+                if (searchArgs.searchTerm != null) {
+                    changeSearchTerm(searchArgs.searchTerm)
+                }
+            }
+    }
+
     fun onChangeFilter(filter: Filter) {
         updateFilter(filter)
     }
 
     fun onChangeSearchTerm(searchTerm: String) {
         changeSearchTerm(searchTerm)
+    }
+
+    fun onSetArgs(arguments: Bundle) {
+        changeArgs(arguments)
     }
 }

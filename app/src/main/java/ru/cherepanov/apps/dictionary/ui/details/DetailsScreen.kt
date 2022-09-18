@@ -1,10 +1,12 @@
 package ru.cherepanov.apps.dictionary.ui.details
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.input.TextFieldValue
@@ -95,7 +97,7 @@ private fun DefDetailsMainContent(
     fullDef: FormattedWordDef,
 ) {
     DefDetailsPanel(
-        modifier = modifier,
+        modifier = modifier.padding(horizontal = 8.dp),
         fullDef = fullDef
     )
 }
@@ -121,7 +123,6 @@ private fun DetailsTopAppBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 private fun DefDetailsPanel(
@@ -136,16 +137,11 @@ private fun DefDetailsPanel(
             provideSelectedText = { textFieldValue.getSelectedText().text }
         )
     ) {
-        TextField(
+        BasicTextField(
             modifier = modifier,
             value = textFieldValue,
             onValueChange = { textFieldValue = it },
-            readOnly = true,
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Unspecified,
-                unfocusedIndicatorColor = Color.Unspecified,
-                focusedIndicatorColor = Color.Unspecified
-            )
+            readOnly = true
         )
     }
 }

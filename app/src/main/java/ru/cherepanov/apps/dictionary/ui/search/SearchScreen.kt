@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.ui.search
 
+import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import kotlinx.coroutines.delay
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.Filter
@@ -38,12 +40,16 @@ import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
+    arguments: Bundle?,
     onSelectSuggestion: (String) -> Unit = {},
-    onBackPressed: () -> Unit = {}
+    onBackPressed: () -> Unit = {},
+    viewModelStoreOwner: ViewModelStoreOwner
 ) {
     SearchScreen(
         modifier = modifier,
-        viewModel = hiltViewModel(),
+        viewModel = hiltViewModel<SearchViewModel>(viewModelStoreOwner).apply {
+            arguments?.let {  onSetArgs(it) }
+        },
         onBackPressed = onBackPressed,
         onSelectSuggestion = onSelectSuggestion
     )
@@ -198,7 +204,7 @@ private fun SearchTextField(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var textFieldValue by remember(initialText != "") {
+    var textFieldValue by remember(initialText) {
         mutableStateOf(TextFieldValue(initialText).run {
             copy(selection = TextRange(initialText.length))
         })

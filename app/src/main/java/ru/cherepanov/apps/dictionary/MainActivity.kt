@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import dagger.hilt.android.AndroidEntryPoint
 import ru.cherepanov.apps.dictionary.ui.navigation.AppNavHost
 import ru.cherepanov.apps.dictionary.ui.navigation.Args
+import ru.cherepanov.apps.dictionary.ui.navigation.rememberAppState
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -25,7 +26,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppNavHost(
                 args = args,
-                onArgsProcessed = { args = null }
+                onArgsProcessed = { args = null },
+                activityViewModelStoreOwner = this,
+                appState = rememberAppState(finish = this::finish)
             )
         }
     }

@@ -2,6 +2,7 @@ package ru.cherepanov.apps.dictionary.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph
@@ -17,13 +18,16 @@ import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchListArgs
 
 
 @Composable
-fun rememberAppState(navController: NavHostController = rememberNavController()) =
-    remember(navController) {
-        AppState(navController)
-    }
+fun rememberAppState(
+    navController: NavHostController = rememberNavController(),
+    finish: () -> Unit
+) = remember(navController) {
+    AppState(navController, finish)
+}
 
 class AppState(
-    val navController: NavHostController
+    val navController: NavHostController,
+    val finish: () -> Unit
 ) {
     val currentRoute: String
         @Composable
@@ -42,8 +46,10 @@ class AppState(
         }
     }
 
-    fun navigateUp() {
-        navController.navigateUp()
+    fun back() {
+        if (!navController.popBackStack()) {
+            finish()
+        }
     }
 
     fun navigateToDetails(defId: DefId) {
@@ -79,7 +85,7 @@ class AppState(
         }
     }
 
-    fun navigateToSearch(searchTerm: String) {
+    fun navigateToSearch(searchTerm: String? = null) {
         navController.navigate(Destinations.Search.getRoute(SearchArgs(searchTerm)))
     }
 
