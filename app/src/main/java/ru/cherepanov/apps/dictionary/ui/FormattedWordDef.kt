@@ -65,13 +65,8 @@ fun WordDef.toFormatted(
     )
 }
 
-private fun formatValue(value: String?, useAbbr: Boolean) =
-    value.takeIfVisible()?.replaceTagWithStyle(
-        "\\{a full_text=[^\\}]+\\}",
-        "\\{/a\\}",
-        SpanStyle(fontStyle = FontStyle.Italic)
-    )
-
+private fun formatValue(value: String?, useAbbr: Boolean = false) =
+    value.takeIfVisible()?.replaceTagWithStyle(aFullTextReplaceData)
 
 private fun formatFullDefExamples(examples: List<String>, useAbbr: Boolean): AnnotatedString =
     buildAnnotatedString {
@@ -79,9 +74,7 @@ private fun formatFullDefExamples(examples: List<String>, useAbbr: Boolean): Ann
             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                 append("${index + 1}. ")
             }
-            append(
-                example.replaceWtitleTagWithBold()
-            )
+            append(example.formatExample())
             append('\n')
             withStyle(style = SpanStyle(fontSize = 4.sp)) {
                 append('\n')
@@ -91,28 +84,35 @@ private fun formatFullDefExamples(examples: List<String>, useAbbr: Boolean): Ann
 
 private fun formatShortDefExamples(examples: List<String>): AnnotatedString = buildAnnotatedString {
     examples.forEachIndexed { index, example ->
-        append(example.replaceWtitleTagWithBold())
+        append(example.formatExample())
         if (index != examples.lastIndex) {
             append('\n')
         }
     }
 }
 
-private fun String.replaceWtitleTagWithBold() =
-    replaceTagWithStyle(
-        "\\{wtitle\\}",
-        "\\{/wtitle\\}",
-        SpanStyle(fontWeight = FontWeight.Bold)
-    )
+private fun String.formatExample(): AnnotatedString {
+    return replaceTagWithStyle(aFullTextReplaceData, wTitleTagReplaceData)
+}
 
+private val aFullTextReplaceData = ReplaceData(
+    "\\{a full_text=[^\\}]+\\}",
+    "\\{/a\\}",
+    SpanStyle(fontStyle = FontStyle.Italic)
+)
+private val wTitleTagReplaceData = ReplaceData(
+    "\\{wtitle\\}",
+    "\\{/wtitle\\}",
+    SpanStyle(fontWeight = FontWeight.Bold)
+)
 
 private fun String.replaceTagWithStyle(
-    openTag: String,
-    closeTag: String,
-    style: SpanStyle
+    vararg replaceData: ReplaceData
 ) = buildAnnotatedString {
     val string = this@replaceTagWithStyle
-    val searchRegex = "($openTag)|($closeTag)".toRegex()
+    val searchRegex = replaceData.joinToString("|") {
+        "(${it.openTag})|(${it.closeTag})"
+    }.toRegex()
 
     val tagMatches = searchRegex.findAll(string)
 
@@ -123,9 +123,10 @@ private fun String.replaceTagWithStyle(
             val token = string.substring(startIndex, endIndex)
             append(token)
         }
-        val isOpenTag = matchResult.groupValues[1].isNotEmpty()
-        if (isOpenTag) {
-            pushStyle(style)
+        val tagIndex = matchResult.groupValues.indexOfLast { it.isNotEmpty() } - 1
+        val matchReplaceData = replaceData[tagIndex / 2]
+        if (tagIndex % 2 == 0) {
+            pushStyle(matchReplaceData.style)
         } else {
             pop()
         }
@@ -136,6 +137,8 @@ private fun String.replaceTagWithStyle(
         append(string.substring(startIndex, string.length))
     }
 }
+
+private data class ReplaceData(val openTag: String, val closeTag: String, val style: SpanStyle)
 
 private fun List<String>?.takeIfVisible() = takeUnless { isNullOrEmpty() || all { it.isBlank() } }
 
