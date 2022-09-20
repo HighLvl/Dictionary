@@ -149,7 +149,11 @@ private fun AnnotatedString.Builder.SyllablesToGloss(
     gloss: AnnotatedString
 ) {
     TextBlockSpacer()
-    withStyle(MaterialTheme.typography.bodyMedium.toSpanStyle()) {
+    withStyle(
+        MaterialTheme.typography.bodyMedium
+            .copy(color = MaterialTheme.colorScheme.onBackground)
+            .toSpanStyle()
+    ) {
         append(
             createTermToGlossString(
                 term = syllables.ifBlank { title },
@@ -168,7 +172,7 @@ private fun AnnotatedString.Builder.KeyValueRow(
     keyStyle: TextStyle = LocalTextStyle.current,
     keyColor: Color = Color.Unspecified,
     valueStyle: TextStyle = LocalTextStyle.current,
-    valueColor: Color = Color.Unspecified,
+    valueColor: Color = MaterialTheme.colorScheme.onBackground,
     addSpacer: Boolean = false,
     capitalize: Boolean = true
 ) {
@@ -201,7 +205,12 @@ private fun AnnotatedString.Builder.Examples(examples: AnnotatedString?) {
 
     spacing(8.sp)
 
-    withStyle(MaterialTheme.typography.bodyMedium.toSpanStyle()) {
+    withStyle(
+        MaterialTheme.typography.bodyMedium
+            .copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ).toSpanStyle()
+    ) {
         append(examples)
     }
 }
@@ -218,7 +227,7 @@ private fun AnnotatedString.Builder.KeyValueColumn(
     keyStyle: TextStyle = LocalTextStyle.current,
     keyColor: Color = Color.Unspecified,
     valueStyle: TextStyle = LocalTextStyle.current,
-    valueColor: Color = Color.Unspecified,
+    valueColor: Color = MaterialTheme.colorScheme.onBackground,
     value: AnnotatedString?,
     addSpacer: Boolean = false,
     keySpaceHeight: TextUnit = 8.sp,

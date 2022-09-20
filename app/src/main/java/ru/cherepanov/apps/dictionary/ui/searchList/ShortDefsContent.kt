@@ -122,7 +122,7 @@ private fun ShortDefItem(
                 }
                 TextBlockSpacer()
             }
-            Text(text = gloss)
+            Text(text = gloss, style = MaterialTheme.typography.bodyMedium)
             Examples(examples = examplesText)
             if (synonyms != null || antonyms != null) {
                 TextBlockSpacer(height = 4.dp)
@@ -178,10 +178,11 @@ private fun Examples(
     Text(
         text = examples,
         fontStyle = FontStyle.Italic,
-        color = Color.Gray,
+        color = MaterialTheme.colorScheme.secondary,
         softWrap = true,
         overflow = TextOverflow.Ellipsis,
-        maxLines = 3
+        maxLines = 3,
+        style = MaterialTheme.typography.bodyMedium
     )
 }
 

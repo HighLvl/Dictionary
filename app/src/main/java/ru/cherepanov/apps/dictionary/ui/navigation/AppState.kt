@@ -2,7 +2,6 @@ package ru.cherepanov.apps.dictionary.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph
@@ -12,9 +11,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.Arguments
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.DetailsArgs
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchArgs
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchListArgs
+import ru.cherepanov.apps.dictionary.ui.details.DetailsArgs
+import ru.cherepanov.apps.dictionary.ui.search.SearchArgs
+import ru.cherepanov.apps.dictionary.ui.searchList.SearchListArgs
 
 
 @Composable

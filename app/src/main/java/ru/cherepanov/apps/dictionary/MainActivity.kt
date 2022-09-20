@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import dagger.hilt.android.AndroidEntryPoint
+import ru.cherepanov.apps.dictionary.ui.base.composable.theme.AppTheme
 import ru.cherepanov.apps.dictionary.ui.navigation.AppNavHost
 import ru.cherepanov.apps.dictionary.ui.navigation.Args
 import ru.cherepanov.apps.dictionary.ui.navigation.rememberAppState
@@ -24,12 +25,14 @@ class MainActivity : ComponentActivity() {
             args = it.getArgs()
         }
         setContent {
-            AppNavHost(
-                args = args,
-                onArgsProcessed = { args = null },
-                activityViewModelStoreOwner = this,
-                appState = rememberAppState(finish = this::finish)
-            )
+            AppTheme {
+                AppNavHost(
+                    args = args,
+                    onArgsProcessed = { args = null },
+                    activityViewModelStoreOwner = this,
+                    appState = rememberAppState(finish = this::finish)
+                )
+            }
         }
     }
 

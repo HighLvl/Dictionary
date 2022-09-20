@@ -10,7 +10,6 @@ import ru.cherepanov.apps.dictionary.domain.model.Resource
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.SearchListArgs
 import javax.inject.Inject
 
 data class SearchListState(

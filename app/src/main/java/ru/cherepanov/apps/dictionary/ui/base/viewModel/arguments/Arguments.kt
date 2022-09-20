@@ -6,7 +6,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 @Serializable
-sealed class Arguments {
+abstract class Arguments {
     protected open fun encodeToString(): String {
         return ""
     }

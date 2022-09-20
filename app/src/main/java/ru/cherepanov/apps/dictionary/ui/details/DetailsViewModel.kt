@@ -10,7 +10,6 @@ import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
-import ru.cherepanov.apps.dictionary.ui.base.viewModel.arguments.DetailsArgs
 import ru.cherepanov.apps.dictionary.ui.toFormatted
 import javax.inject.Inject
 
