@@ -3,17 +3,18 @@ package ru.cherepanov.apps.dictionary.ui.searchList
 import androidx.lifecycle.SavedStateHandle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Observable
-import ru.cherepanov.apps.dictionary.domain.interactors.*
+import ru.cherepanov.apps.dictionary.domain.interactors.GetShortDefs
+import ru.cherepanov.apps.dictionary.domain.interactors.UpdateFavorites
 import ru.cherepanov.apps.dictionary.domain.interactors.base.ValueInteractor
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Resource
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 import javax.inject.Inject
 
 data class SearchListState(
-    val shortDefs: List<FormattedWordDef> = emptyList(),
+    val shortDefs: List<WordDef> = emptyList(),
     val title: String = "",
     val defId: DefId? = null,
     val status: Status = Status.LOADING
@@ -69,7 +70,7 @@ class SearchListViewModel @Inject constructor(
             .subscribeAndObserveOnMainThread(disposables) { shortDefsResource ->
                 if (shortDefsResource is Resource.Success) {
                     shortDefsResource.data.shortDefs.firstOrNull()?.let {
-                        setTitle(it.title)
+                        setTitle(it.id.title)
                     }
                 }
             }

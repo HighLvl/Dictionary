@@ -1,35 +1,47 @@
 package ru.cherepanov.apps.dictionary.ui.details
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ru.cherepanov.apps.dictionary.ui.AnnotationTag
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDefStub
+import ru.cherepanov.apps.dictionary.ui.base.composable.theme.wordLinkColor
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
+import ru.cherepanov.apps.dictionary.ui.searchList.detectTapUnconsumed
+import ru.cherepanov.apps.dictionary.ui.toFormatted
 
 
 @Composable
 fun DefDetailsScreen(
     modifier: Modifier = Modifier,
-    onBackPressed: () -> Unit = {}
+    onBackPressed: () -> Unit = {},
+    onClickWord: (String) -> Unit
 ) {
     DefDetailsScreen(
         modifier = modifier,
         viewModel = hiltViewModel(),
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
+        onClickWord
     )
 }
 
@@ -37,15 +49,23 @@ fun DefDetailsScreen(
 private fun DefDetailsScreen(
     modifier: Modifier,
     viewModel: DetailsViewModel,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onClickWord: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.observeUiState()
+
+    val wordLinkColor = MaterialTheme.colorScheme.wordLinkColor
+    val fullDef = remember(uiState.wordDef) {
+        uiState.wordDef.toFormatted(
+            isDetails = true,
+            wordLinkColor = wordLinkColor
+        )
+    }
 
     StatusScaffold(
         modifier = modifier,
         status = uiState.status,
         topBar = {
-            val fullDef = uiState.wordDef
             DetailsTopAppBar(
                 num = fullDef.num,
                 title = fullDef.id.title,
@@ -70,9 +90,9 @@ private fun DefDetailsScreen(
         onSuccess = {
             Column {
                 DefDetailsMainContent(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    fullDef = derivedStateOf { uiState.wordDef }.value
+                    modifier = Modifier.fillMaxWidth(),
+                    fullDef = fullDef,
+                    onClickWord = onClickWord
                 )
                 if (!uiState.wordDef.isFull) {
                     LoadingError(
@@ -95,10 +115,12 @@ private fun DefDetailsScreen(
 private fun DefDetailsMainContent(
     modifier: Modifier,
     fullDef: FormattedWordDef,
+    onClickWord: (String) -> Unit,
 ) {
     DefDetailsPanel(
         modifier = modifier.padding(horizontal = 8.dp),
-        fullDef = fullDef
+        fullDef = fullDef,
+        onClickWord = onClickWord
     )
 }
 
@@ -123,14 +145,43 @@ private fun DetailsTopAppBar(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
 private fun DefDetailsPanel(
     modifier: Modifier = Modifier,
-    fullDef: FormattedWordDef = formattedWordDefStub()
+    fullDef: FormattedWordDef = formattedWordDefStub(),
+    onClickWord: (String) -> Unit = {}
 ) {
+
     val text = fullDef.getDetailsAnnotatedString()
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
+
+    val onClickText: (Int) -> Unit = { offset ->
+        text.getStringAnnotations(AnnotationTag.URI.value, offset, offset)
+            .firstOrNull()
+            ?.let {
+                onClickWord(it.item)
+            }
+    }
+
+    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    val scrollState = rememberScrollState()
+
+    val pressIndicator = Modifier.pointerInput(Unit) {
+        detectTapUnconsumed { pos ->
+            layoutResult.value?.let { layoutResult ->
+                val localPos = layoutResult.getOffsetForPosition(
+                    pos + Offset(
+                        0f,
+                        scrollState.value.toFloat()
+                    )
+                )
+                onClickText(localPos)
+            }
+        }
+    }
+
     CompositionLocalProvider(
         LocalTextToolbar provides AppTextToolbar(
             LocalView.current,
@@ -138,11 +189,17 @@ private fun DefDetailsPanel(
         )
     ) {
         BasicTextField(
-            modifier = modifier,
+            modifier = modifier
+                .then(pressIndicator)
+                .verticalScroll(scrollState),
             value = textFieldValue,
             onValueChange = { textFieldValue = it },
-            readOnly = true
+            readOnly = true,
+            onTextLayout = {
+                layoutResult.value = it
+            }
         )
+
     }
 }
 

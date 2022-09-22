@@ -52,13 +52,13 @@ class AppState(
     }
 
     fun navigateToDetails(defId: DefId) {
-        navController.navigate(Destinations.Details.getRoute(DetailsArgs(defId)))
+        navController.navigate(Destinations.Details, DetailsArgs(defId))
     }
 
     fun navigateToSearchList(
         defId: DefId? = null
     ) {
-        navController.navigate(Destinations.SearchList.getRoute(SearchListArgs(defId = defId)))
+        navController.navigate(Destinations.SearchList, SearchListArgs(defId = defId))
     }
 
     fun navigateToSearchList(title: String) {
@@ -74,18 +74,21 @@ class AppState(
         }
     }
 
+    fun navigateToSearchListFromDetails(title: String) {
+        navController.navigate(Destinations.SearchList, SearchListArgs(title = title))
+    }
+
     fun navigateToSearchInitially(searchTerm: String?) {
         navController.popBackStack(Destinations.Home.route, true)
         if (searchTerm == null) {
-            val route = Destinations.SearchList.getRoute(SearchListArgs())
-            navController.navigate(route)
+            navController.navigate(Destinations.SearchList, SearchListArgs())
         } else {
             navigateToSearch(searchTerm)
         }
     }
 
     fun navigateToSearch(searchTerm: String? = null) {
-        navController.navigate(Destinations.Search.getRoute(SearchArgs(searchTerm)))
+        navController.navigate(Destinations.Search, SearchArgs(searchTerm))
     }
 
     fun isOnlyEntryInBackStack(backStackEntry: NavBackStackEntry): Boolean {
@@ -102,7 +105,7 @@ class AppState(
     private fun <T : Arguments> NavHostController.navigate(
         destination: Destinations<T>,
         args: T,
-        navOptionsBuilder: NavOptionsBuilder.() -> Unit
+        navOptionsBuilder: NavOptionsBuilder.() -> Unit = {}
     ) {
         navigate(destination.getRoute(args), navOptionsBuilder)
     }

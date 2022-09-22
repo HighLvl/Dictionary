@@ -1,4 +1,9 @@
 package ru.cherepanov.apps.dictionary.ui.base.composable.theme
+
+import androidx.annotation.ColorRes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF2B5EA7)
@@ -61,3 +66,10 @@ val md_theme_dark_surfaceTint = Color(0xFFAAC7FF)
 
 
 val seed = Color(0xFFF5F6FF)
+
+@ColorRes
+val favoriteIconColorRes = android.R.color.holo_red_light
+
+val ColorScheme.wordLinkColor: Color
+    @Composable
+    get() = if (isSystemInDarkTheme()) Color(0xFFFFFF8F) else Color.Blue

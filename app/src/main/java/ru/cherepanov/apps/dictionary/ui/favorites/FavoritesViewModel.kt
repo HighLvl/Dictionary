@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.cherepanov.apps.dictionary.domain.interactors.GetFavorites
 import ru.cherepanov.apps.dictionary.domain.interactors.UpdateFavorites
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.BaseViewModel
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class FavoritesViewModel @Inject constructor(
     private val getFavorites: GetFavorites,
     private val updateFavorites: UpdateFavorites
-) : BaseViewModel<PagingData<FormattedWordDef>>(initialState = PagingData.from(emptyList())) {
+) : BaseViewModel<PagingData<WordDef>>(initialState = PagingData.from(emptyList())) {
 
     val pagingData = uiState.asFlow().cachedIn(viewModelScope)
 

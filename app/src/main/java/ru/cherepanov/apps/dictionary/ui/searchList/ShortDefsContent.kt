@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +23,8 @@ import kotlinx.coroutines.launch
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_BOTTOM
+import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_HORIZONTAL
 import ru.cherepanov.apps.dictionary.ui.base.composable.DefList
 import ru.cherepanov.apps.dictionary.ui.base.composable.DefTitle
 import ru.cherepanov.apps.dictionary.ui.base.composable.FavoriteIcon
@@ -62,14 +63,14 @@ fun ShortDefContent(
         modifier = modifier,
         scrollState = scrollState,
         contentPadding = PaddingValues(
-            top = 8.dp + topContentPadding,
+            top = topContentPadding,
             bottom = bottomContentPadding
         )
     ) {
         items(shortDefs, key = { it.id }) {
             ShortDefItem(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = SHORT_DEF_ITEM_PADDING_HORIZONTAL),
                 wordDef = it,
                 isFavoriteDef = { isFavorite ->
                     if (isFavorite) {
@@ -79,7 +80,7 @@ fun ShortDefContent(
                     }
                 }
             ) { onClick(it.id) }
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(SHORT_DEF_ITEM_PADDING_BOTTOM))
         }
     }
 }
@@ -122,7 +123,12 @@ private fun ShortDefItem(
                 }
                 TextBlockSpacer()
             }
-            Text(text = gloss, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = gloss,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
             Examples(examples = examplesText)
             if (synonyms != null || antonyms != null) {
                 TextBlockSpacer(height = 4.dp)

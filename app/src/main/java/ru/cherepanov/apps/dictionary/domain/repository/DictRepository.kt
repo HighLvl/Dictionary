@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -20,5 +21,5 @@ abstract class DictRepository(
     abstract fun removeFromFavorites(id: DefId): Completable
     abstract fun findWordTitles(searchTerm: String, filter: Filter): Single<List<String>>
     abstract fun getFullDefById(id: DefId): Observable<WordDef>
-    abstract fun getFavorites(): PagingSource<Int, WordDefEntity>
+    abstract fun getFavorites(): Observable<PagingData<WordDef>>
 }

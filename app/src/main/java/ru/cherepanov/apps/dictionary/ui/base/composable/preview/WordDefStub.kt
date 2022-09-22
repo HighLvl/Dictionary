@@ -1,5 +1,6 @@
 package ru.cherepanov.apps.dictionary.ui.base.composable.preview
 
+import androidx.compose.ui.graphics.Color
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
@@ -20,4 +21,4 @@ fun wordDefStub(): WordDef {
     )
 }
 
-fun formattedWordDefStub(): FormattedWordDef = wordDefStub().toFormatted()
+fun formattedWordDefStub(): FormattedWordDef = wordDefStub().toFormatted(wordLinkColor = Color.Blue)

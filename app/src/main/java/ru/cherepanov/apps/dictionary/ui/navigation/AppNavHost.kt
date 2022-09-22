@@ -57,7 +57,8 @@ fun AppNavHost(
                 onSelectWordSuggestion = { appState.navigateToSearchList(it) },
                 onShowSearch = appState::navigateToSearch,
                 isBackButtonGone = appState::isOnlyEntryInBackStack,
-                provideSearchViewModelStoreOwner =  { activityViewModelStoreOwner }
+                provideSearchViewModelStoreOwner =  { activityViewModelStoreOwner },
+                onClickWord = appState::navigateToSearchListFromDetails
             )
             favoritesGraph(
                 contentPadding = it,
@@ -79,7 +80,8 @@ private fun NavGraphBuilder.mainGraph(
     onSelectWordSuggestion: (String) -> Unit,
     onShowSearch: () -> Unit,
     isBackButtonGone: (NavBackStackEntry) -> Boolean,
-    provideSearchViewModelStoreOwner: () -> ViewModelStoreOwner
+    provideSearchViewModelStoreOwner: () -> ViewModelStoreOwner,
+    onClickWord: (String) -> Unit
 ) {
     navigation(startDestination = Destinations.Home.route, Sections.Main.route) {
         addHomeDestination(navigateToSearch, searchTerm)
@@ -90,7 +92,7 @@ private fun NavGraphBuilder.mainGraph(
             onShowSearch,
             isBackButtonGone
         )
-        addDetailsDestination(contentPadding, onBackPressed)
+        addDetailsDestination(contentPadding, onBackPressed, onClickWord)
         addSearchDestination(
             contentPadding,
             onBackPressed,
@@ -113,12 +115,14 @@ private fun NavGraphBuilder.addHomeDestination(
 
 private fun NavGraphBuilder.addDetailsDestination(
     contentPadding: PaddingValues,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onClickWord: (String) -> Unit
 ) {
     composable(Destinations.Details.route) {
         DefDetailsScreen(
             modifier = Modifier.padding(contentPadding),
-            onBackPressed = onBackPressed
+            onBackPressed = onBackPressed,
+            onClickWord = onClickWord
         )
     }
 }

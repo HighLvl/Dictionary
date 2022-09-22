@@ -14,10 +14,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import androidx.paging.map
+import kotlinx.coroutines.flow.map
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
+import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
+import ru.cherepanov.apps.dictionary.ui.toFormatted
 
 
 @Composable
@@ -42,7 +46,9 @@ private fun FavoritesScreen(
     onItemSelected: (DefId) -> Unit,
     onBackPressed: (() -> Unit)
 ) {
-    val lazyPagingItems = viewModel.pagingData.collectAsLazyPagingItems()
+    val lazyPagingItems = viewModel.pagingData.map {
+        it.map(WordDef::toFormatted)
+    }.collectAsLazyPagingItems()
 
     Scaffold(
         modifier = modifier,

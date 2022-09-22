@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -23,9 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
+import ru.cherepanov.apps.dictionary.domain.model.WordDef
+import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_BOTTOM
+import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_HORIZONTAL
 import ru.cherepanov.apps.dictionary.ui.base.TOP_APPBAR_HEIGHT
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
+import ru.cherepanov.apps.dictionary.ui.toFormatted
 
 @Composable
 fun SearchListScreen(
@@ -83,21 +88,21 @@ private fun SearchListScreen(
             TOP_APPBAR_HEIGHT.dp.toPx()
         }
     )
+    if (scrollState.firstVisibleItemScrollOffset == 0) {
+        collapsingToolbarState.expand()
+    }
+
     val scrollConnection = rememberCollapsingToolbarConnection(
         toolbarState = collapsingToolbarState,
         scrollableState = scrollState
     )
-
     StatusScaffold(
         modifier = modifier,
         status = uiState.status,
         floatingActionButton = {
             RandomWordFloatingButton(
                 modifier = Modifier.padding(bottom = 8.dp, end = 16.dp),
-                onClick = {
-                    onLoadRandomWord()
-                    collapsingToolbarState.expand()
-                }
+                onClick = onLoadRandomWord
             )
         },
         topBar = {
@@ -123,14 +128,17 @@ private fun SearchListScreen(
             )
         },
         onSuccess = {
+            val shortDefs = remember(uiState.shortDefs) {
+                uiState.shortDefs.map(WordDef::toFormatted)
+            }
             ShortDefContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollConnection),
-                topContentPadding = TOP_APPBAR_HEIGHT.dp,
+                topContentPadding = TOP_APPBAR_HEIGHT.dp + SHORT_DEF_ITEM_PADDING_BOTTOM,
                 bottomContentPadding = 80.dp,
                 scrollState = scrollState,
-                shortDefs = uiState.shortDefs,
+                shortDefs = shortDefs,
                 addToFavorites = onAddToFavorites,
                 removeFromFavorites = onRemoveFromFavorites,
                 onClick = onSelectShortDef,
@@ -195,8 +203,9 @@ private fun SearchButton(
 ) {
     Surface(
         modifier = modifier
-            .height(TOP_APPBAR_HEIGHT.dp)
-            .padding(8.dp)
+            .height(TOP_APPBAR_HEIGHT.dp + SHORT_DEF_ITEM_PADDING_BOTTOM)
+            .padding(vertical = SHORT_DEF_ITEM_PADDING_BOTTOM)
+            .padding(horizontal = SHORT_DEF_ITEM_PADDING_HORIZONTAL)
             .fillMaxWidth(),
         onClick = onClick,
         shadowElevation = 8.dp,

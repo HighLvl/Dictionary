@@ -1,10 +1,14 @@
 package ru.cherepanov.apps.dictionary.domain.repository
 
-import androidx.paging.PagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import androidx.paging.rxjava2.observable
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import ru.cherepanov.apps.dictionary.data.db.WordDefEntity
+import ru.cherepanov.apps.dictionary.data.db.mapToWordDef
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.Filter
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
@@ -71,7 +75,18 @@ class RepositoryImpl @Inject constructor(localSource: LocalSource, remoteSource:
                 localSource.getByIdObservable(id)
             }
 
-    override fun getFavorites(): PagingSource<Int, WordDefEntity> {
-        return localSource.getFavorites()
+    override fun getFavorites(): Observable<PagingData<WordDef>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 32,
+                enablePlaceholders = true
+            )
+        ) {
+            localSource.getFavorites()
+        }.observable.map { pagingData ->
+            pagingData.map { entity ->
+                entity.mapToWordDef()
+            }
+        }
     }
 }

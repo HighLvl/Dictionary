@@ -6,8 +6,6 @@ import ru.cherepanov.apps.dictionary.domain.interactors.base.ResourceSubjectInte
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.domain.repository.DictRepository
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
-import ru.cherepanov.apps.dictionary.ui.toFormatted
 import javax.inject.Inject
 
 class GetShortDefs @Inject constructor(private val repository: DictRepository) :
@@ -15,16 +13,16 @@ class GetShortDefs @Inject constructor(private val repository: DictRepository) :
     override fun createObservable(args: Args): Observable<Result> {
         return when (args.mode) {
             Mode.Random -> repository.getRandomWordShortDefs().map {
-                Result(shortDefs = it.map(WordDef::toFormatted))
+                Result(shortDefs = it)
             }
             is Mode.ByTitle -> repository.getShortDefsByTitle(args.mode.title).map {
-                Result(shortDefs = it.map(WordDef::toFormatted))
+                Result(shortDefs = it)
             }
             is Mode.BringIntoView -> {
                 var bringIntoView: DefId? = args.mode.defId
                 repository.getShortDefsByTitle(args.mode.defId.title)
                     .map {
-                        Result(shortDefs = it.map(WordDef::toFormatted), bringIntoView).also {
+                        Result(shortDefs = it, bringIntoView).also {
                             bringIntoView = null
                         }
                     }
@@ -33,7 +31,7 @@ class GetShortDefs @Inject constructor(private val repository: DictRepository) :
             .subscribeOn(Schedulers.io())
     }
 
-    data class Result(val shortDefs: List<FormattedWordDef>, val bringIntoView: DefId? = null)
+    data class Result(val shortDefs: List<WordDef>, val bringIntoView: DefId? = null)
 
     data class Args(val mode: Mode)
 
