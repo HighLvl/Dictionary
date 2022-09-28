@@ -19,18 +19,18 @@
 ## Скриншоты
 
 <figure>
-<img alt="Карточки определений" height="500" src="screenshots/Screenshot_20220928-145452_Dictionary.jpg"/>
 <figcaption>Карточки определений</figcaption>
+<img alt="Карточки определений" height="500" src="screenshots/Screenshot_20220928-145452_Dictionary.jpg"/>
 </figure>
 <figure>
-<img alt="Подробнее" height="500" src="screenshots/Screenshot_20220928-142743_Dictionary.jpg"/>
 <figcaption>Подробнее</figcaption>
+<img alt="Подробнее" height="500" src="screenshots/Screenshot_20220928-142743_Dictionary.jpg"/>
 </figure>
 <figure>
-<img alt="Избранное" height="500" src="screenshots/Screenshot_20220928-141834_Dictionary.jpg"/>
 <figcaption>Избранное</figcaption>
+<img alt="Избранное" height="500" src="screenshots/Screenshot_20220928-141834_Dictionary.jpg"/>
 </figure>
 <figure>
-<img alt="Поиск" height="500" src="screenshots/Screenshot_20220928-141852_Dictionary.jpg"/>
 <figcaption>Поиск</figcaption>
+<img alt="Поиск" height="500" src="screenshots/Screenshot_20220928-141852_Dictionary.jpg"/>
 </figure>
