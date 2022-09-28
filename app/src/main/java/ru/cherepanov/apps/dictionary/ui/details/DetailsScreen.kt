@@ -1,6 +1,5 @@
 package ru.cherepanov.apps.dictionary.ui.details
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,15 +19,15 @@ import androidx.compose.ui.text.input.getSelectedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ru.cherepanov.apps.dictionary.ui.AnnotationTag
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.ui.base.AnnotationTag
+import ru.cherepanov.apps.dictionary.ui.base.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.composable.preview.formattedWordDefStub
 import ru.cherepanov.apps.dictionary.ui.base.composable.theme.wordLinkColor
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
+import ru.cherepanov.apps.dictionary.ui.base.toFormatted
 import ru.cherepanov.apps.dictionary.ui.base.viewModel.Status
 import ru.cherepanov.apps.dictionary.ui.searchList.detectTapUnconsumed
-import ru.cherepanov.apps.dictionary.ui.toFormatted
 
 
 @Composable
@@ -145,7 +144,6 @@ private fun DetailsTopAppBar(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
 private fun DefDetailsPanel(

@@ -1,4 +1,4 @@
-package ru.cherepanov.apps.dictionary
+package ru.cherepanov.apps.dictionary.ui
 
 import android.content.Intent
 import android.os.Bundle

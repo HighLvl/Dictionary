@@ -9,7 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.compose.ui.geometry.Rect
-import ru.cherepanov.apps.dictionary.MainActivity
+import ru.cherepanov.apps.dictionary.ui.MainActivity
 
 
 private enum class MenuItemOption(val id: Int, val resource: Int) {

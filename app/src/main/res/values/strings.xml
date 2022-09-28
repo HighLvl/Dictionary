@@ -14,11 +14,9 @@
     <string name="full_hyper_label">гиперонимы:\u0020</string>
     <string name="phras_label">фразеологизмы и устойчивые сочетания:\u0020</string>
     <string name="ipa_label">МФА:\u0020</string>
-    <string name="phras_item">\'%1$s\'</string>
     <string name="search_label">Поиск</string>
     <string name="favorites_label">Избранное</string>
     <string name="dash_gloss">\u0020\u2014\u0020</string>
-    <string name="context_menu_search">Поиск</string>
     <string name="search_mode_label">Режим поиска:</string>
     <string name="search_mode_fuzzy">Нечеткий</string>
     <string name="search_mode_prefix">Префикс</string>

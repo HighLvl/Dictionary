@@ -30,7 +30,7 @@ import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_HORIZONTAL
 import ru.cherepanov.apps.dictionary.ui.base.TOP_APPBAR_HEIGHT
 import ru.cherepanov.apps.dictionary.ui.base.composable.*
 import ru.cherepanov.apps.dictionary.ui.base.observeUiState
-import ru.cherepanov.apps.dictionary.ui.toFormatted
+import ru.cherepanov.apps.dictionary.ui.base.toFormatted
 
 @Composable
 fun SearchListScreen(

@@ -3,8 +3,8 @@ package ru.cherepanov.apps.dictionary.ui.base.composable.preview
 import androidx.compose.ui.graphics.Color
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
-import ru.cherepanov.apps.dictionary.ui.toFormatted
+import ru.cherepanov.apps.dictionary.ui.base.FormattedWordDef
+import ru.cherepanov.apps.dictionary.ui.base.toFormatted
 
 fun wordDefStub(): WordDef {
     return WordDef(

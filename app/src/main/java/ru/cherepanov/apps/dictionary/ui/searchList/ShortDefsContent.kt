@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.cherepanov.apps.dictionary.R
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.ui.base.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_BOTTOM
 import ru.cherepanov.apps.dictionary.ui.base.SHORT_DEF_ITEM_PADDING_HORIZONTAL
 import ru.cherepanov.apps.dictionary.ui.base.composable.DefList

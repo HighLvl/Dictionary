@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.cherepanov.apps.dictionary.R
-import ru.cherepanov.apps.dictionary.ui.FormattedWordDef
+import ru.cherepanov.apps.dictionary.ui.base.FormattedWordDef
 import ru.cherepanov.apps.dictionary.ui.base.composable.createTermToGlossString
 
 @Composable

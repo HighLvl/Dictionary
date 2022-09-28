@@ -1,4 +1,4 @@
-package ru.cherepanov.apps.dictionary.ui
+package ru.cherepanov.apps.dictionary.ui.base
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -10,7 +10,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import ru.cherepanov.apps.dictionary.domain.model.DefId
 import ru.cherepanov.apps.dictionary.domain.model.WordDef
-import ru.cherepanov.apps.dictionary.ui.base.RomanNumeral
 
 data class FormattedWordDef(
     val id: DefId,

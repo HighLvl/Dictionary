@@ -2,7 +2,6 @@ package ru.cherepanov.apps.dictionary.domain.repository
 
 import io.reactivex.Single
 import ru.cherepanov.apps.dictionary.domain.model.DefId
-import ru.cherepanov.apps.dictionary.domain.model.WordDef
 import ru.cherepanov.apps.dictionary.domain.model.WordDefRemoteData
 
 interface RemoteSource {
